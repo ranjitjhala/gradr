@@ -15,6 +15,7 @@ yesod-devel/
 .DS_Store
 *.swp
 *.keter
+cabal-dev
 *.o
 *.hi
 *.chi
