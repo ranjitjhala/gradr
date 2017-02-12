@@ -4,16 +4,23 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
+import Text.Email.Validate  (isValid)
+import Network.Mail.Mime
 
 -- Used only when in "auth-dummy-login" setting is enabled.
 import Yesod.Auth.Dummy
+import Yesod.Auth.Account
 
-import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
+import Yesod.Auth.Message (AuthMessage (InvalidLogin))
+-- import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
+import qualified Auth.Account as Auth
+
+-- import qualified Data.Text as T
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -198,21 +205,56 @@ instance YesodAuth App where
     -- Override the above two destinations when a Referer: header is present
     redirectToReferer _ = True
 
+    -- authenticate creds = runDB $ do
+        -- x <- getBy $ UniqueUser $ credsIdent creds
+        -- case x of
+            -- Just (Entity uid _) -> return $ Authenticated uid
+            -- Nothing -> Authenticated <$> insert User
+                -- { userIdent = credsIdent creds
+                -- , userPassword = Nothing
+                -- }
+
     authenticate creds = runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
-        case x of
-            Just (Entity uid _) -> return $ Authenticated uid
-            Nothing -> Authenticated <$> insert User
-                { userIdent = credsIdent creds
-                , userPassword = Nothing
-                }
+        x <- getBy $ UniqueUser (credsIdent creds)
+        return $ case x of
+            Just (Entity uid _) -> Authenticated uid
+            Nothing -> UserError InvalidLogin
 
     -- You can add other plugins like Google Email, email or OAuth here
-    authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
+    authPlugins app = accountPlugin : extraAuthPlugins
         -- Enable authDummy login if enabled.
         where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
     authHttpManager = getHttpManager
+
+instance AccountSendEmail App where
+  sendVerifyEmail user email url = liftIO $
+    sendEmail email
+      "Confirm your account"
+        ( ("Hi " ++ user ++ ",\n\nPlease click this link to confirm your account:\n" ++ url))
+
+  sendNewPasswordEmail user email url = liftIO $
+    sendEmail email
+      "Reset your password"
+        ( ("Hi " ++ user ++ ",\n\nPlease click this link to reset your password:\n" ++ url))
+
+sendEmail :: Text -> Text -> body -> IO ()
+sendEmail email subject body = renderSendMail =<< mail
+  where
+    mail = simpleMail to from subject "body-goes-here" "" []
+    from = Address (Just "gradr") "rjhala@eng.ucsd.edu"
+    to   = Address Nothing email
+
+-- instance YesodJquery App
+
+instance YesodAuthAccount (AccountPersistDB App User) App where
+  runAccountDB = runAccountPersistDB
+  getNewAccountR = Auth.getNewAccountR
+  postNewAccountR = Auth.postNewAccountR
+  checkValidUsername u | isValid (TE.encodeUtf8 u) = return $ Right u
+  checkValidUsername _ = do
+    mr <- getMessageRender
+    return $ Left $ mr InvalidLogin
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult

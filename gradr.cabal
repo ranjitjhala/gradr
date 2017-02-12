@@ -24,6 +24,8 @@ library
                      Handler.Home
                      Handler.Comment
                      Handler.Profile
+                     Auth.Account
+
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -58,6 +60,7 @@ library
                  , yesod                         >= 1.4.3      && < 1.5
                  , yesod-core                    >= 1.4.17     && < 1.5
                  , yesod-auth                    >= 1.4.0      && < 1.5
+                 , yesod-auth-account
                  , yesod-static                  >= 1.4.0.3    && < 1.6
                  , yesod-form                    >= 1.4.0      && < 1.5
                  , classy-prelude                >= 0.10.2
@@ -86,6 +89,7 @@ library
                  , fast-logger                   >= 2.2        && < 2.5
                  , wai-logger                    >= 2.2        && < 2.4
                  , file-embed
+                 , email-validate
                  , safe
                  , unordered-containers
                  , containers
@@ -93,6 +97,7 @@ library
                  , time
                  , case-insensitive
                  , wai
+                 , mime-mail
 
 executable         gradr
     if flag(library-only)
@@ -154,6 +159,7 @@ test-suite test
     build-depends: base
                  , gradr
                  , yesod-auth
+                 , yesod-auth-account
                  , yesod-test >= 1.5.2 && < 1.6
                  , yesod-core
                  , yesod

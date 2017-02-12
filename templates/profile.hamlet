@@ -8,3 +8,14 @@
 
     <p>
       Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
+
+    <p>
+      However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
+
+    <h2>
+      Courses
+
+      <ul>
+        <li> UCSD CSE 131, Fall 2016 
+        <li> UCSD CSE 130, Fall 2015
+        <li> UCSD CSE 130, Fall 2014

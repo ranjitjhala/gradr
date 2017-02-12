@@ -1,34 +1,62 @@
 # TODO
 
-## Model 
+## Model
 
-1. Admin 
+1. Admin
 2. Instructor
-3. Students 
+3. Students
 4. Classes
-5. Assignments 
+5. Assignments
 
-## View 
+## Routes
 
-### Login 
+  /static StaticR Static appStatic
 
-### Instructor 
+  /auth   AuthR   Auth   getAuth
 
-- Home 
-  - List of Classes 
+  /favicon.ico FaviconR GET
+  /robots.txt RobotsR GET
+
+  /         HomeR    GET POST
+
+  /comments CommentR POST
+
+  /profile ProfileR GET
+
+
+  /admin
+
+    - Just shows list of instructors
+
+  /create
+
+  /auth/login
+
+
+
+
+
+
+
+## View
+
+### Login
+
+### Instructor
+
+- Home
+  - List of Classes
 
 - Class
   - List of Evals
-  - Add Eval 
-  - View 
+  - Add Eval
+  - View
 
-### Student 
-
-
-1. New  Instructor 
-1. View Instructors 
+### Student
 
 
-## Controller 
+1. New  Instructor
+1. View Instructors
 
 
+## Controller
