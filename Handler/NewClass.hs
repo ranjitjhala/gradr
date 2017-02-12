@@ -1,6 +1,7 @@
 module Handler.NewClass where
 
 import Import
+import Text.Blaze as TB
 -- import DB
 -- import qualified Util as Util
 -- import qualified Data.ByteString as S
@@ -23,12 +24,12 @@ newClassForm = renderBootstrap3 BootstrapBasicForm $ NewClassForm
 
 postNewClassR :: Handler Html
 postNewClassR = do
-  (uid, user)      <- requireAuthPair
+  (uid    , _)     <- requireAuthPair
   ((result, _), _) <- runFormPost newClassForm
   case result of
     FormSuccess (NewClassForm cName cTerm) -> do
-      classId <- runDB $ insert $ Class cName cTerm uid
-      setMessage "Added new class!"
+      _ <- runDB $ insert $ Class cName cTerm uid
+      setMessage $ "Added new class! " ++ TB.text cName ++ " in term " ++ TB.text cTerm
       redirect ProfileR
     _ -> do
       setMessage "Yikes! Something went wrong"

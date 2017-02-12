@@ -67,8 +67,8 @@ instance Yesod App where
     -- Controls the base of generated URLs. For more information on modifying,
     -- see: https://github.com/yesodweb/yesod/wiki/Overriding-approot
     approot = ApprootRequest $ \app req ->
-        case appRoot $ appSettings app of
-            Nothing -> getApprootText guessApproot app req
+        case appRoot (appSettings app) of
+            Nothing   -> getApprootText guessApproot app req
             Just root -> root
 
     -- Store session data on the client in encrypted cookies,
@@ -106,6 +106,11 @@ instance Yesod App where
                 , NavbarLeft MenuItem
                     { menuItemLabel          = "Profile"
                     , menuItemRoute          = ProfileR
+                    , menuItemAccessCallback = isJust muser
+                    }
+                , NavbarLeft MenuItem
+                    { menuItemLabel          = "Create"
+                    , menuItemRoute          = NewClassR
                     , menuItemAccessCallback = isJust muser
                     }
                 , NavbarRight MenuItem

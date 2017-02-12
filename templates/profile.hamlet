@@ -12,10 +12,11 @@
     <p>
       However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
 
-    <h2>
-      Courses
+    $if not $ null classesByUser
+
+      <h2>
+        Courses
 
       <ul>
-        <li> UCSD CSE 131, Fall 2016 
-        <li> UCSD CSE 130, Fall 2015
-        <li> UCSD CSE 130, Fall 2014
+        $forall (Class name term) <- classByUser
+          <li> #{name}, #{term}
