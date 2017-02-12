@@ -1,12 +1,59 @@
 # TODO
 
+
+HEREHEREHERE:
+  - add "Class" to the config/model
+  - allow a user to create a class
+
 ## Model
 
-1. Admin
-2. Instructor
-3. Students
-4. Classes
-5. Assignments
+1. Users
+    - Admin
+    - Students
+    - Instructors
+
+2. Classes
+    - Instructors :: [User]
+    - Students    :: [User]
+    - Assignments :: [Assignment]
+
+----- config/model
+
+
+User
+  ident            Text
+  password         ByteString
+  emailAddress     Text
+  UniqueUser       emailAddress
+  verified         Bool
+  verifyKey        Text
+  resetPasswordKey Text
+  deriving         Show
+  deriving         Eq
+  deriving         Typeable
+
+Class
+  name             Text
+  term             Text
+  instructor       UserId
+  deriving         Show
+  deriving         Eq
+  deriving         Typeable
+
+Teacher
+  name             UserId          
+  class            ClassId
+
+Student
+  name             UserId
+  class            ClassId
+
+Assignment
+  name             Text
+  points           Int
+  class            ClassId
+
+
 
 ## Routes
 

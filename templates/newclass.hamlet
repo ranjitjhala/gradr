@@ -1,0 +1,10 @@
+<div .ui.container>
+        <div .row>
+            <div .col-lg-6>
+                <div .bs-callout bs-callout-info well>
+                    <p>
+                       Before submitting your paper, make sure all of your authors have an account so that you may add them as authors by email below.
+                    <form .form-horizontal method=post action=@{NewClassR} enctype=#{formEnctype}>
+                        ^{formWidget}
+                        <button .btn.btn-primary type="submit">
+                            Upload it!

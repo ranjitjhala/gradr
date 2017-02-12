@@ -10,6 +10,11 @@ User
     deriving Eq
     deriving Typeable
 
+Class
+    name       Text
+    term       Text
+    instructor UserId
+
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text
     userId UserId Maybe
