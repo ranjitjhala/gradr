@@ -1,59 +1,27 @@
 # TODO
 
+HEREHEREHERE
 
-HEREHEREHERE:
-  - add "Class" to the config/model
-  - allow a user to create a class
+Instructor
+
+- Set "Class" as "current"
+- Add Assignments to "current" class
+- View "current" assignments
+- Add Students to "current" class
+- View "current" students
+- Upload scores for Assignment (by CSV)
+- Download scores for class (by CSV)
+
+Student
+
+- View classes
+- Set "class" as "current"
+- View scores
+
 
 ## Model
 
-1. Users
-    - Admin
-    - Students
-    - Instructors
-
-2. Classes
-    - Instructors :: [User]
-    - Students    :: [User]
-    - Assignments :: [Assignment]
-
------ config/model
-
-
-User
-  ident            Text
-  password         ByteString
-  emailAddress     Text
-  UniqueUser       emailAddress
-  verified         Bool
-  verifyKey        Text
-  resetPasswordKey Text
-  deriving         Show
-  deriving         Eq
-  deriving         Typeable
-
-Class
-  name             Text
-  term             Text
-  instructor       UserId
-  deriving         Show
-  deriving         Eq
-  deriving         Typeable
-
-Teacher
-  name             UserId          
-  class            ClassId
-
-Student
-  name             UserId
-  class            ClassId
-
-Assignment
-  name             Text
-  points           Int
-  class            ClassId
-
-
+See `config/models`
 
 ## Routes
 

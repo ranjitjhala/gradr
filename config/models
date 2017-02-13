@@ -15,6 +15,25 @@ Class
     term       Text
     instructor UserId
 
+Teacher
+  name         UserId
+  class        ClassId
+
+Student
+  name         UserId
+  class        ClassId
+
+Assignment
+  name         Text
+  points       Int
+  class        ClassId
+
+Score
+  student      UserId
+  assignment   AssignmentId
+  points       Int
+
+
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text
     userId UserId Maybe
