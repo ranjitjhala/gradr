@@ -12,13 +12,13 @@
     <p>
       However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
 
-    $if not $ null classesByUser
+    $if not $ null userClasses
 
       <h2>
         Courses
 
       <ul>
 
-        $forall (Class name term _) <- classesByUser
+        $forall (Entity classId (Class name term _)) <- userClasses
 
-          <li> #{name}, #{term}
+          <li> <a href=@{ClassR classId}> #{name}, #{term} </a>

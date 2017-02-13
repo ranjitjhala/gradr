@@ -1,8 +1,9 @@
-module Handler.NewClass where
+module Handler.Class where
 
-import Import
-import Text.Blaze as TB
--- import DB
+import           Import
+import qualified Text.Blaze as TB
+import           DB
+
 -- import qualified Util as Util
 -- import qualified Data.ByteString as S
 -- import qualified Data.ByteString.Lazy as L
@@ -11,13 +12,28 @@ import Text.Blaze as TB
 import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
 -- import Yesod.Form.Jquery (jqueryAutocompleteField)
 
+
+--------------------------------------------------------------------------------
+-- | Viewing Existing Classes --------------------------------------------------
+--------------------------------------------------------------------------------
+getClassR :: ClassId -> Handler Html
+getClassR classId = do
+  klass <- getClassById classId
+  instr <- getUserById (classInstructor klass)
+  defaultLayout $
+    $(widgetFile "viewclass")
+
+--------------------------------------------------------------------------------
+-- | Creating New Classes ------------------------------------------------------
+--------------------------------------------------------------------------------
+
 data NewClassForm = NewClassForm
     { name       :: Text
     , term       :: Text
     }
     deriving (Show)
 
-newClassForm ::  Form NewClassForm
+newClassForm :: Form NewClassForm
 newClassForm = renderBootstrap3 BootstrapBasicForm $ NewClassForm
     <$> areq textField "Name" (Just "CSE 130: Programming Languages")
     <*> areq textField "Term" (Just "Fall 2017")
@@ -37,7 +53,6 @@ postNewClassR = do
 
 getNewClassR :: Handler Html
 getNewClassR = do
-  (_uid, user)              <- requireAuthPair
   (formWidget, formEnctype) <- generateFormPost newClassForm
   defaultLayout $
     $(widgetFile "newclass")

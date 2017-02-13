@@ -1,23 +1,46 @@
 # TODO
 
-HEREHEREHERE
+Policies
+
+* Only an instructor can add assignments
+* Only an instructor can add students
+
+## Set Class as Current
+
+- [ ] Class-link in "profile" issues route
+
+    /class/#ClassId ClassR GET
+
+- [ ] Handler for the above route
+
+    Handler/Class.hs
+    getClassR :: Handler Html
+
+  The handler should:
+
+    1. [ ] Set the class as the current class
+
+    2. [ ] Print out some information about the class
+           - list of assignments and points
+
+    3. [ ] Have a form for adding new assignments
 
 Instructor
 
-- Set "Class" as "current"
-- Add Assignments to "current" class
-- View "current" assignments
-- Add Students to "current" class
-- View "current" students
-- Upload scores for Assignment (by CSV)
-- Download scores for class (by CSV)
+- [ ] Set "Class" as "current"
+- [ ] Add Assignments to "current" class
+- [ ] View "current" assignments
+
+- [ ] Add Students to "current" class
+- [ ] View "current" students
+- [ ] Upload scores for Assignment (by CSV)
+- [ ] Download scores for class (by CSV)
 
 Student
 
-- View classes
-- Set "class" as "current"
-- View scores
-
+- [ ] View classes
+- [ ] Set "class" as "current"
+- [ ] View scores
 
 ## Model
 

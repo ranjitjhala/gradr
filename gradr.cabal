@@ -24,7 +24,7 @@ library
                      Handler.Home
                      Handler.Comment
                      Handler.Profile
-                     Handler.NewClass
+                     Handler.Class
                      Auth.Account
                      DB
 

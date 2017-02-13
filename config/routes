@@ -11,3 +11,5 @@
 /profile ProfileR GET
 
 /newclass NewClassR GET POST
+
+/class/#ClassId ClassR GET

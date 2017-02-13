@@ -1,0 +1,15 @@
+<div .ui.container>
+
+    <h1> #{className klass} : #{classTerm klass}
+
+    <p> Taught by #{userIdent instr}
+
+    <p> The page is protected and access is allowed only for authenticated users.
+
+    <h2> View Assignments
+
+    <h2> New Assignment
+
+    <h2> View Students
+
+    <h2> Add Students
