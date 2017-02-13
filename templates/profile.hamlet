@@ -18,5 +18,7 @@
         Courses
 
       <ul>
-        $forall (Class name term) <- classByUser
+
+        $forall (Class name term _) <- classesByUser
+
           <li> #{name}, #{term}

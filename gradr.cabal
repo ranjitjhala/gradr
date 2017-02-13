@@ -101,6 +101,7 @@ library
                  , wai
                  , mime-mail
                  , blaze-markup
+                 , esqueleto
 
 executable         gradr
     if flag(library-only)
