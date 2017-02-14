@@ -5,20 +5,20 @@ import Yesod.Auth.Account
 import qualified Yesod.Auth.Message as Msg
 import qualified Data.Text as T
 
-getNewAccountR :: YesodAuthAccount db site 
+getNewAccountR :: YesodAuthAccount db site
                   => HandlerT Auth (HandlerT site IO) Html
 getNewAccountR = do
     tm <- getRouteToParent
     lift $ defaultLayout $ do
         setTitleI Msg.RegisterLong
-        customNewAccountWidget tm 
+        customNewAccountWidget tm
 
-postNewAccountR :: YesodAuthAccount db site 
+postNewAccountR :: YesodAuthAccount db site
                    => HandlerT Auth (HandlerT site IO) Html
 postNewAccountR = do
     tm <- getRouteToParent
     mr <- lift getMessageRender
-    ((result, _), _) <- lift $ runFormPost $ renderDivs customNewAccountForm 
+    ((result, _), _) <- lift $ runFormPost $ renderDivs customNewAccountForm
     mdata <- case result of
                 FormMissing -> invalidArgs ["Form is missing"]
                 FormFailure msg -> return $ Left msg
@@ -34,19 +34,19 @@ postNewAccountR = do
                       redirect route
 
 -- | The data collected in the new account form.
-data CustomNewAccountData = CustomNewAccountData {
-      newAccountEmail :: Text
-    , newAccountName :: Text
-    , password1 :: Text
-    , password2 :: Text
-} deriving Show
+data CustomNewAccountData = CustomNewAccountData
+  { newAccountEmail :: Text
+  , newAccountName  :: Text
+  , password1       :: Text
+  , password2       :: Text
+  } deriving Show
 
 -- | Custom form for creating a new account
 customNewAccountForm :: (MonadHandler m, RenderMessage (HandlerSite m) FormMessage)
                         => AForm m CustomNewAccountData
-customNewAccountForm = CustomNewAccountData <$> areq textField "Email" Nothing
-                                            <*> areq textField "Name" Nothing
-                                            <*> areq passwordField "Password" Nothing
+customNewAccountForm = CustomNewAccountData <$> areq textField     "Email"            Nothing
+                                            <*> areq textField     "Name"             Nothing
+                                            <*> areq passwordField "Password"         Nothing
                                             <*> areq passwordField "Confirm Password" Nothing
 -- | The registration form
 customNewAccountWidget :: YesodAuthAccount db master
@@ -63,9 +63,9 @@ customNewAccountWidget tm = do
 
 -- | Creates a new custom account
 createNewCustomAccount :: YesodAuthAccount db master
-                          => CustomNewAccountData
-                          -> (Route Auth -> Route master)
-                          -> HandlerT master IO (AuthRoute)
+                       => CustomNewAccountData
+                       -> (Route Auth -> Route master)
+                       -> HandlerT master IO AuthRoute
 createNewCustomAccount (CustomNewAccountData email name pwd _) tm = do
     muser <- runAccountDB $ loadUser email
     case muser of
@@ -73,10 +73,9 @@ createNewCustomAccount (CustomNewAccountData email name pwd _) tm = do
                      redirect $ tm newAccountR
         Nothing -> return ()
 
-    key <- newVerifyKey
+    key    <- newVerifyKey
     hashed <- hashPassword pwd
-
-    mnew <- runAccountDB $ addNewUser name email key hashed
+    mnew   <- runAccountDB $ addNewUser name email key hashed
     _ <- case mnew of
         Left err -> do setMessage $ toHtml err
                        redirect $ tm newAccountR

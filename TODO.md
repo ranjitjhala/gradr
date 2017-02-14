@@ -1,13 +1,25 @@
 # TODO
 
-Policies
+## Policies
 
 * Only an instructor can add assignments
 * Only an instructor can add students
-* Only a student in a class can see scores
-* Student can only see their own scores
+* Only an instructor can view the students in a class
+* Only an instructor can view the assignments in a class
+* Only an instructor can view the scores in a class
+* Only a student in a class can see the assignments
+* Only a student in a class can see their own scores
 
-## Set Class as Current
+## HEREHERE: Adding Students to Class
+
++ Upload a CSV file with:
+
+    email, name, sid
+
++ Parse file and create accounts
+
+
+## View-Class-as-Instructor
 
 - [x] Class-link in "profile" issues route
 
@@ -21,72 +33,21 @@ Policies
     - [x] list of assignments and points
     - [x] form for adding new assignments
 
-Instructor
+- [x] Add Students to class         (by FORM)
 
 - [ ] Add Students to class         (by CSV)
+    - See [upload csv](http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file)
+
 - [ ] View students in class
+
 - [ ] Upload scores for Assignment  (by CSV)
+
 - [ ] Download scores for class     (by CSV)
 
-Student
+
+
+## View-Class-as-Instructor
 
 - [ ] View classes
 - [ ] Select class
 - [ ] View assignment scores
-
-## Model
-
-See `config/models`
-
-## Routes
-
-  /static StaticR Static appStatic
-
-  /auth   AuthR   Auth   getAuth
-
-  /favicon.ico FaviconR GET
-  /robots.txt RobotsR GET
-
-  /         HomeR    GET POST
-
-  /comments CommentR POST
-
-  /profile ProfileR GET
-
-
-  /admin
-
-    - Just shows list of instructors
-
-  /create
-
-  /auth/login
-
-
-
-
-
-
-
-## View
-
-### Login
-
-### Instructor
-
-- Home
-  - List of Classes
-
-- Class
-  - List of Evals
-  - Add Eval
-  - View
-
-### Student
-
-
-1. New  Instructor
-1. View Instructors
-
-
-## Controller

@@ -15,3 +15,7 @@
 /class/#ClassId ClassR GET
 
 /newassign/#ClassId NewAssignR POST
+
+/newstudent/#ClassId NewStudentR POST
+
+/assignment/#ClassId/#AssignmentId AssignmentR GET

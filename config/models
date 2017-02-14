@@ -1,10 +1,10 @@
 User
-    ident Text
-    password ByteString
-    emailAddress Text
-    UniqueUser emailAddress
-    verified Bool
-    verifyKey Text
+    ident            Text
+    password         ByteString
+    emailAddress     Text
+    UniqueUser       emailAddress
+    verified         Bool
+    verifyKey        Text
     resetPasswordKey Text
     deriving Show
     deriving Eq
@@ -32,7 +32,6 @@ Score
   student      UserId
   assignment   AssignmentId
   points       Int
-
 
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text

@@ -19,8 +19,8 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 import qualified Auth.Account as Auth
-
--- import qualified Data.Text as T
+import qualified Data.Text      as T
+import qualified Data.Text.Lazy as LT
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -147,17 +147,19 @@ instance Yesod App where
     authRoute _ = Just $ AuthR LoginR
 
     -- Routes not requiring authentication.
-    isAuthorized (AuthR _) _      = return Authorized
-    isAuthorized CommentR _       = return Authorized
-    isAuthorized HomeR _          = return Authorized
-    isAuthorized FaviconR _       = return Authorized
-    isAuthorized RobotsR _        = return Authorized
-    isAuthorized (StaticR _) _    = return Authorized
+    isAuthorized (AuthR _) _       = return Authorized
+    isAuthorized CommentR _        = return Authorized
+    isAuthorized HomeR _           = return Authorized
+    isAuthorized FaviconR _        = return Authorized
+    isAuthorized RobotsR _         = return Authorized
+    isAuthorized (StaticR _) _     = return Authorized
 
-    isAuthorized ProfileR    _    = isAuthenticated
-    isAuthorized NewClassR   _    = isAuthenticated
-    isAuthorized (NewAssignR _) _ = isAuthenticated
-    isAuthorized (ClassR _)  _    = isAuthenticated
+    isAuthorized ProfileR    _        = isAuthenticated
+    isAuthorized NewClassR   _        = isAuthenticated
+    isAuthorized (NewAssignR _) _     = isAuthenticated
+    isAuthorized (ClassR _)  _        = isAuthenticated
+    isAuthorized (AssignmentR _ _ ) _ = isAuthenticated
+    isAuthorized (NewStudentR _) _    = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -238,19 +240,21 @@ instance YesodAuth App where
 
 instance AccountSendEmail App where
   sendVerifyEmail user email url = liftIO $
-    sendEmail email
-      "Confirm your account"
-        ( ("Hi " ++ user ++ ",\n\nPlease click this link to confirm your account:\n" ++ url))
+    sendEmail email "Confirm your account" (emailBody "confirm your account" user url)
 
   sendNewPasswordEmail user email url = liftIO $
-    sendEmail email
-      "Reset your password"
-        ( ("Hi " ++ user ++ ",\n\nPlease click this link to reset your password:\n" ++ url))
+    sendEmail email "Reset your password" (emailBody "reset your password" user url)
 
-sendEmail :: Text -> Text -> body -> IO ()
+emailBody :: T.Text -> T.Text -> T.Text -> LT.Text
+emailBody action user url = LT.fromStrict $
+  "Dear " ++ user ++ ",<br>" ++
+  "Please click this link to " ++ action ++ ":<br>" ++
+  url
+
+sendEmail :: Text -> Text -> LT.Text -> IO ()
 sendEmail email subject body = renderSendMail =<< mail
   where
-    mail = simpleMail to from subject "body-goes-here" "" []
+    mail = simpleMail to from subject "" body []
     from = Address (Just "gradr") "rjhala@eng.ucsd.edu"
     to   = Address Nothing email
 
