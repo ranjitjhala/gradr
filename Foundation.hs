@@ -147,17 +147,18 @@ instance Yesod App where
     authRoute _ = Just $ AuthR LoginR
 
     -- Routes not requiring authentication.
-    isAuthorized (AuthR _) _   = return Authorized
-    isAuthorized CommentR _    = return Authorized
-    isAuthorized HomeR _       = return Authorized
-    isAuthorized FaviconR _    = return Authorized
-    isAuthorized RobotsR _     = return Authorized
-    isAuthorized (StaticR _) _ = return Authorized
+    isAuthorized (AuthR _) _      = return Authorized
+    isAuthorized CommentR _       = return Authorized
+    isAuthorized HomeR _          = return Authorized
+    isAuthorized FaviconR _       = return Authorized
+    isAuthorized RobotsR _        = return Authorized
+    isAuthorized (StaticR _) _    = return Authorized
 
-    isAuthorized ProfileR    _ = isAuthenticated
-    isAuthorized NewClassR   _ = isAuthenticated
-    isAuthorized (ClassR _)  _ = isAuthenticated
-    
+    isAuthorized ProfileR    _    = isAuthenticated
+    isAuthorized NewClassR   _    = isAuthenticated
+    isAuthorized (NewAssignR _) _ = isAuthenticated
+    isAuthorized (ClassR _)  _    = isAuthenticated
+
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
     -- expiration dates to be set far in the future without worry of

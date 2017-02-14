@@ -6,10 +6,25 @@
 
     <p> The page is protected and access is allowed only for authenticated users.
 
+
     <h2> View Assignments
 
-    <h2> New Assignment
+      <ul>
+
+        $forall (Entity _ (Assignment aName aPts _)) <- asgns
+
+          <li> #{aName} : #{aPts} points
+
 
     <h2> View Students
 
     <h2> Add Students
+
+    <h2> New Assignment
+
+      <div .col-lg-6>
+        <div .bs-callout bs-callout-info well>
+          <form .form-horizontal method=post action=@{NewAssignR classId} enctype=#{asgnEnc}>
+              ^{asgnWidget}
+              <button .btn.btn-primary type="submit">
+                Create!

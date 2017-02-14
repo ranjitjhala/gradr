@@ -20,3 +20,7 @@ getUserById :: Key User -> Handler User
 getUserById ident = do
   mfile <- runDB $ get ident
   maybe notFound return mfile
+
+getAssignmentsByClass :: Key Class -> Handler [Entity Assignment]
+getAssignmentsByClass classId =
+  runDB $ selectList [AssignmentClass ==. classId] []

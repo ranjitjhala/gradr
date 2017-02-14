@@ -13,3 +13,5 @@
 /newclass NewClassR GET POST
 
 /class/#ClassId ClassR GET
+
+/newassign/#ClassId NewAssignR POST
