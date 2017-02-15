@@ -21,4 +21,4 @@
 
         $forall (Entity classId (Class name term _)) <- userClasses
 
-          <li> <a href=@{ClassR classId}> #{name}, #{term} </a>
+          <li> <a href=@{ClassInsR classId}> #{name}, #{term} </a>

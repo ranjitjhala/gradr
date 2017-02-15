@@ -8,11 +8,21 @@
 
     <table>
       <tr>
-        <td>Student
-        <td>Score
+        <td><b>Student &nbsp;
+        <td><b>Email   &nbsp;
+        <td><b>Score
 
-      $forall (sEmail, sPoints) <- scores
+      $forall (Entity _ user, pts) <- scores
 
         <tr>
-          <td> #{sEmail}
-          <td> #{sPoints}
+          <td> #{userIdent        user}
+          <td> #{userEmailAddress user}
+          <td> #{pts}
+
+
+    <h2> Update Scores
+        <div .bs-callout bs-callout-info well>
+          <form .form-horizontal method=post action=@{ScoreR classId assignId} enctype=#{stdEnc}>
+              ^{stdWidget}
+              <button .btn.btn-primary type="submit">
+                Update

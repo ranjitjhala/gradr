@@ -10,16 +10,7 @@
 * Only a student in a class can see the assignments
 * Only a student in a class can see their own scores
 
-## HEREHERE: Adding Students to Class
-
-+ Upload a CSV file with:
-
-    email, name, sid
-
-+ Parse file and create accounts
-
-
-## View-Class-as-Instructor
+## Instructor Views
 
 - [x] Class-link in "profile" issues route
 
@@ -33,21 +24,27 @@
     - [x] list of assignments and points
     - [x] form for adding new assignments
 
-- [x] Add Students to class         (by FORM)
+- [x] Add students to class     
 
-- [ ] Add Students to class         (by CSV)
+- [x] View students in class
+
+- [x] Add scores for Assignment
+
+- [ ] Add other instructors for class
+
+- [ ] Add scores for Assignment  by CSV
+
+- [ ] Add Students to class      by CSV
     - See [upload csv](http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file)
 
-- [ ] View students in class
+- [ ] Download scores for class  by CSV
 
-- [ ] Upload scores for Assignment  (by CSV)
+## Student View
 
-- [ ] Download scores for class     (by CSV)
+- [ ] View classes (profile) HEREHEREHERE
+      * /class/student/#ClassId  ClassStdR GET
 
-
-
-## View-Class-as-Instructor
-
-- [ ] View classes
 - [ ] Select class
+      * Click on above link
+
 - [ ] View assignment scores

@@ -1,7 +1,7 @@
 module DB where
 
 -- import qualified Data.List as L
--- import qualified Data.Text as T
+import qualified Data.HashMap.Strict as M
 import           Import
 import qualified Database.Esqueleto as E
 import           Database.Esqueleto ((^.))
@@ -43,6 +43,32 @@ getStudentsByClass classId =
                       E.&&.
                       (student ^. StudentClass E.==. E.val classId)
                return user
+
+getRawScores :: Key Assignment -> Handler [(Text, Int)]
+getRawScores assignId = do
+  scores <- runDB $ selectList [ScoreAssignment ==. assignId] []
+  forM scores $ \(Entity _ (Score uid _ pts)) -> do
+    user <- getUserById uid
+    return (userEmailAddress user, pts)
+
+getAssignmentScores :: ClassId -> AssignmentId -> Handler [(Entity User, Int)]
+getAssignmentScores classId assignId = do
+  students  <- getStudentsByClass classId
+  rawScores <- getRawScores assignId
+  return     $ updScores [ (u, 0) | u <- students ] rawScores
+
+updScores :: [(Entity User, Int)] -> [(Text, Int)] -> [(Entity User, Int)]
+updScores us ens = [ (fst u, score u) | u <- us ]
+  where
+    score (u, n) = M.lookupDefault n (userKey u) scorem
+    scorem       = M.fromList [(e, n) | (e, n) <- ens ]
+    userKey      = userEmailAddress . entityVal
+
+updAssignmentScores :: AssignmentId -> [(Entity User, Int)] -> Handler ()
+updAssignmentScores assignId scores = do
+  _ <- runDB $ deleteWhere [ScoreAssignment ==. assignId]
+  _ <- runDB $ insertMany [Score uid assignId pts | (Entity uid _, pts) <- scores]
+  return ()
 
 {-
   getPapersToReview :: Handler [(E.Value (Key Review)
