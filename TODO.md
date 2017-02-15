@@ -39,16 +39,23 @@
 - [ ] Add scores for Assignment  by CSV
 
 - [ ] Add Students to class      by CSV
-    - See [upload csv](http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file)
+    - See [upload-csv][upload]
 
 - [ ] Download scores for class  by CSV
 
 ## Student View
 
-- [ ] View classes (profile) HEREHEREHERE
-      * /class/student/#ClassId  ClassStdR GET
+- [x] View classes (profile)
 
-- [ ] Select class
-      * Click on above link
+- [x] Select class
 
 - [ ] View assignment scores
+      HEREHEREHERE
+      * wipe the databases (UNIQUENESS)
+      * add teachers
+      * add classes
+      * add students
+      * add assignments
+      * test student-views
+
+[upload]: http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file

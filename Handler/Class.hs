@@ -32,8 +32,11 @@ getClassInsR classId = do
     $(widgetFile "viewClassInstructor")
 
 getClassStdR :: ClassId -> Handler Html
-getClassStdR _ = do
-  setMessage "TODO: getClassStdR: HEREHEREHEREHERE"
+getClassStdR classId = do
+  -- setMessage "TODO: getClassStdR: HEREHEREHEREHERE"
+  (userId, _) <- requireAuthPair
+  klass       <- getClassById classId
+  scores      <- getScoresByUser userId classId
   defaultLayout $
     $(widgetFile "viewClassStudent")
 

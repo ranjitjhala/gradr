@@ -1,37 +1,42 @@
 User
-    ident            Text
-    password         ByteString
-    emailAddress     Text
-    UniqueUser       emailAddress
-    verified         Bool
-    verifyKey        Text
-    resetPasswordKey Text
-    deriving Show
-    deriving Eq
-    deriving Typeable
+  ident            Text
+  password         ByteString
+  emailAddress     Text
+  UniqueUser       emailAddress
+  verified         Bool
+  verifyKey        Text
+  resetPasswordKey Text
+  deriving Show
+  deriving Eq
+  deriving Typeable
 
 Class
-    name       Text
-    term       Text
-    instructor UserId
+  name       Text
+  term       Text
+  instructor UserId
+  UniqueClass name term instructor
 
 Teacher
   name         UserId
   class        ClassId
+  UniqueTeacher name class
 
 Student
   name         UserId
   class        ClassId
+  UniqueStudent name class
 
 Assignment
   name         Text
   points       Int
   class        ClassId
+  UniqueAssignment name class
 
 Score
   student      UserId
   assignment   AssignmentId
   points       Int
+  UniqueScore  student assignment
 
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text

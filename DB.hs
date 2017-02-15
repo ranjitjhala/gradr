@@ -96,3 +96,14 @@ updAssignmentScores assignId scores = do
   _ <- runDB $ deleteWhere [ScoreAssignment ==. assignId]
   _ <- runDB $ insertMany [Score uid assignId pts | (Entity uid _, pts) <- scores]
   return ()
+
+getScoresByUser :: UserId -> ClassId -> Handler [(Assignment, Int)]
+getScoresByUser userId classId = do
+  ass <- runDB $ E.select
+           $ E.from
+             $ \(assign `E.InnerJoin` score) -> do
+               E.on $ (assign ^. AssignmentClass E.==. E.val classId)
+                      E.&&.
+                      (score  ^. ScoreStudent    E.==. E.val userId)
+               return ( assign, score )
+  return [ (a, scorePoints s) | (Entity _ a, Entity _ s) <- ass ]

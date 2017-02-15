@@ -6,64 +6,21 @@
 
     <!------------------------------------------------------------------------->
 
-    <h2> Instructors
-
-    <br>
-
-    <ul>
-      $forall u <- instructors
-        <li> #{userIdent u} : #{userEmailAddress u}
-
-    <br>
-
-    <h3> Add
-
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewInstructorR classId} enctype=#{insEnc}>
-              ^{insWidget}
-              <button .btn.btn-primary type="submit">
-                Add
-
-    <hr>
-
-    <!------------------------------------------------------------------------->
-
     <h2> Assignments
 
     <br>
 
     <ul>
-      $forall (Entity assignId (Assignment aName aPts _)) <- asgns
-        <li> <a href=@{AssignmentR classId assignId}> #{aName} : #{aPts} points </a>
+      <table>
+        <tr>
+          <td><b>Assignment
+          <td><b>Score
+          <td><b>Max
 
-    <br>
-
-    <h3> Add
-
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewAssignR classId} enctype=#{asgnEnc}>
-              ^{asgnWidget}
-              <button .btn.btn-primary type="submit">
-                Add
-
-    <hr>
+        $forall (asgn, score) <- scores
+          <tr>
+            <td>#{assignmentName   asgn}
+            <td>#{score}
+            <td>#{assignmentPoints asgn}
 
     <!------------------------------------------------------------------------->
-
-    <h2> Students
-
-    <br>
-
-    <ul>
-      $forall (Entity _ u) <- students
-        <li> #{userIdent u} : #{userEmailAddress u}
-
-    <br>
-
-    <h3> Add
-
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewStudentR classId} enctype=#{stdEnc}>
-              ^{stdWidget}
-              <button .btn.btn-primary type="submit">
-                Add
