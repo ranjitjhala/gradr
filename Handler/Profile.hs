@@ -5,8 +5,9 @@ import           DB
 
 getProfileR :: Handler Html
 getProfileR = do
-    (_, user)    <- requireAuthPair
-    userClasses  <- getClassesByUser
+    (uid, user) <- requireAuthPair
+    insClasses  <- getClassesInsByUser uid
+    stdClasses  <- getClassesStdByUser uid
     defaultLayout $ do
         setTitle . toHtml $ userIdent user <> "'s User page"
         $(widgetFile "profile")

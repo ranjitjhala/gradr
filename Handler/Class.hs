@@ -19,14 +19,23 @@ import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
 --------------------------------------------------------------------------------
 getClassInsR :: ClassId -> Handler Html
 getClassInsR classId = do
-  klass    <- getClassById classId
-  instr    <- getUserById (classInstructor klass)
-  asgns    <- getAssignmentsByClass classId
-  students <- getStudentsByClass    classId
+  klass                 <- getClassById classId
+  instr                 <- getUserById (classInstructor klass)
+  asgns                 <- getAssignmentsByClass classId
+  students              <- getStudentsByClass    classId
+  teachers              <- fmap entityVal <$> getInstructorsByClass classId
+  let instructors        = instr : teachers
   (asgnWidget, asgnEnc) <- generateFormPost newAssignForm
-  (stdWidget,  stdEnc)  <- generateFormPost newStudentForm
+  (stdWidget,  stdEnc)  <- generateFormPost addUserForm
+  (insWidget,  insEnc)  <- generateFormPost addUserForm
   defaultLayout $
-    $(widgetFile "viewclass")
+    $(widgetFile "viewClassInstructor")
+
+getClassStdR :: ClassId -> Handler Html
+getClassStdR _ = do
+  setMessage "TODO: getClassStdR: HEREHEREHEREHERE"
+  defaultLayout $
+    $(widgetFile "viewClassStudent")
 
 getAssignmentR :: ClassId -> AssignmentId -> Handler Html
 getAssignmentR classId assignId = do
@@ -52,6 +61,26 @@ postScoreR classId assignId = do
     (AssignmentR classId assignId)
 
 --------------------------------------------------------------------------------
+-- | Adding New Instructors ----------------------------------------------------
+--------------------------------------------------------------------------------
+postNewInstructorR :: ClassId -> Handler Html
+postNewInstructorR classId =
+  extendClassFormR
+    "add instructor"
+    addUserForm
+    (addInstructorR classId)
+    classId
+    (ClassInsR classId)
+
+addInstructorR :: ClassId -> AddUserForm -> Handler ()
+addInstructorR classId userForm = do
+  mbStd <- addUserR classId userForm
+  case mbStd of
+    Nothing ->    setMessage $ "Error adding instructor: " ++ TB.text (auEmail userForm)
+    Just e  -> do setMessage $ "Added instructor: "        ++ TB.text (auEmail userForm)
+                  void $ runDB (insert (Teacher (entityKey e) classId))
+
+--------------------------------------------------------------------------------
 -- | Creating New Assignments --------------------------------------------------
 --------------------------------------------------------------------------------
 postNewAssignR :: ClassId -> Handler Html
@@ -67,26 +96,6 @@ addAssignR :: ClassId -> NewAssignForm -> Handler ()
 addAssignR classId (NewAssignForm aName aPts) = do
   _ <- runDB $ insert $ Assignment aName aPts classId
   setMessage $ "Added new assignment: " ++ TB.text aName
-
-{-
-postNewAssignR classId = do
-  instrId          <- classInstructor <$> getClassById classId
-  (uid    , _)     <- requireAuthPair
-  if uid /= instrId
-    then do setMessage "Sorry, can only create assignments for your own class!"
-            redirect (ClassR classId)
-    else do
-      ((result, _), _) <- runFormPost newAssignForm
-      case result of
-        FormSuccess (NewAssignForm aName aPts) -> do
-          _ <- runDB $ insert $ Assignment aName aPts classId
-          setMessage $ "Added new assignment: " ++ TB.text aName
-          redirect (ClassR classId)
-        _ -> do
-          setMessage "Yikes! Something went wrong"
-          redirect NewClassR
--}
-
 
 scoreForm :: [(Entity User, Int)] -> Form [(Text, Int)]
 scoreForm scores = renderBootstrap3 BootstrapBasicForm
@@ -106,21 +115,6 @@ dummyScores = [ ("Michael", 26)
               , ("Robert" , 19)
               ]
 
-{-
-scoreForm = renderBootstrap3 BootstrapBasicForm $ inputList "People" massTable
-  (\x -> (,)
-    <$> pure (fromMaybe "???" (fst <$> x))
-    -- areq textField "Email" (fmap fst x)
-    <*> areq intField  "Score"   (fmap snd x))
-  (Just dummyScores)
-
-
-newStudentForm :: Form NewStudentForm
-newStudentForm = renderBootstrap3 BootstrapBasicForm $ NewStudentForm
-  <$> areq textField "Name"  Nothing
-  <*> areq textField "Email" Nothing
--}
-
 data NewAssignForm = NewAssignForm
   { asgnName   :: Text
   , asgnPoints :: Int
@@ -135,36 +129,40 @@ newAssignForm = renderBootstrap3 BootstrapBasicForm $ NewAssignForm
 --------------------------------------------------------------------------------
 -- | Enrolling New Students ----------------------------------------------------
 --------------------------------------------------------------------------------
-data NewStudentForm = NewStudentForm
-    { studentName  :: Text
-    , studentEmail :: Text
-    }
-    deriving (Show)
+data AddUserForm = AddUserForm
+  { auEmail :: Text }
+  deriving (Show)
 
-newStudentForm :: Form NewStudentForm
-newStudentForm = renderBootstrap3 BootstrapBasicForm $ NewStudentForm
-  <$> areq textField "Name"  Nothing
-  <*> areq textField "Email" Nothing
+addUserForm :: Form AddUserForm
+addUserForm = renderBootstrap3 BootstrapBasicForm $ AddUserForm
+  <$> areq textField "Email" Nothing
 
 postNewStudentR :: ClassId -> Handler Html
 postNewStudentR classId =
   extendClassFormR
     "enroll student"
-    newStudentForm
+    addUserForm
     (addStudentR classId)
     classId
     (ClassInsR classId)
 
-addStudentR :: ClassId -> NewStudentForm -> Handler ()
-addStudentR classId (NewStudentForm sName sEmail) = do
-  _     <- Auth.createNewCustomAccount
-            (Auth.CustomNewAccountData sEmail sName sEmail sEmail)
-            (const (ClassInsR classId))
-  mbStd <- getUserByEmail sEmail
+addStudentR :: ClassId -> AddUserForm -> Handler ()
+addStudentR classId userForm = do
+  mbStd <- addUserR classId userForm
   case mbStd of
-    Nothing -> setMessage ("Error enrolling student: " ++ TB.text sEmail)
-    Just e  -> do setMessage ("Enrolled student: "     ++ TB.text sEmail)
+    Nothing ->    setMessage $ "Error enrolling student: " ++ TB.text (auEmail userForm)
+    Just e  -> do setMessage $ "Enrolled student: "        ++ TB.text (auEmail userForm)
                   void $ runDB (insert (Student (entityKey e) classId))
+
+addUserR :: ClassId -> AddUserForm -> Handler (Maybe (Entity User))
+addUserR classId (AddUserForm sEmail) = do
+  mbU <- getUserByEmail sEmail
+  case mbU of
+    Just _  -> return mbU
+    Nothing -> do _ <- Auth.createNewCustomAccount
+                         (Auth.CustomNewAccountData sEmail ("?" ++ sEmail ++ "?") sEmail sEmail)
+                         (const (ClassInsR classId))
+                  getUserByEmail sEmail
 
 --------------------------------------------------------------------------------
 -- | Generic Class Extension ---------------------------------------------------

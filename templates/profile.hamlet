@@ -1,24 +1,31 @@
 <div .ui.container>
 
-    <h1>
-      Access granted!
+  <p> Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
 
-    <p>
-      This page is protected and access is allowed only for authenticated users.
+  <p> However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
 
-    <p>
-      Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
+  <hr>
 
-    <p>
-      However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
+  <!--------------------------------------------------------------------------->
 
-    $if not $ null userClasses
+  $if not $ null insClasses
 
-      <h2>
-        Courses
+    <h2> Teaching
 
-      <ul>
+    <ul>
+      $forall (Entity classId (Class name term _)) <- insClasses
+        <li> <a href=@{ClassInsR classId}> #{name}, #{term} </a>
 
-        $forall (Entity classId (Class name term _)) <- userClasses
+  <hr>
 
-          <li> <a href=@{ClassInsR classId}> #{name}, #{term} </a>
+  <!--------------------------------------------------------------------------->
+
+  $if not $ null stdClasses
+
+    <h2> Taking
+
+    <ul>
+      $forall (Entity classId (Class name term _)) <- stdClasses
+        <li> <a href=@{ClassStdR classId}> #{name}, #{term} </a>
+
+  <hr>

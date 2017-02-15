@@ -13,10 +13,13 @@
 /newclass NewClassR GET POST
 
 /class/instructor/#ClassId ClassInsR GET
+/class/student/#ClassId    ClassStdR GET
 
 /newassign/#ClassId NewAssignR POST
 
 /newstudent/#ClassId NewStudentR POST
+
+/newinstructor/#ClassId NewInstructorR POST
 
 /assignment/#ClassId/#AssignmentId AssignmentR GET
 

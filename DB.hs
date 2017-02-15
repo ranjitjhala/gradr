@@ -6,10 +6,27 @@ import           Import
 import qualified Database.Esqueleto as E
 import           Database.Esqueleto ((^.))
 
-getClassesByUser :: Handler [Entity Class]
-getClassesByUser = do
-  (uid, _) <- requireAuthPair
-  runDB $ selectList [ClassInstructor ==. uid] []
+getClassesInsByUser :: Key User -> Handler [Entity Class]
+getClassesInsByUser userId = do
+  es  <- runDB $ selectList [ClassInstructor ==. userId] []
+  es' <- runDB $ E.select
+                  $ E.from
+                    $ \(teacher `E.InnerJoin` clss) -> do
+                      E.on $ (teacher ^. TeacherName  E.==. E.val userId)
+                             E.&&.
+                             (teacher ^. TeacherClass E.==. clss ^. ClassId)
+                      return clss
+  return (es ++ es')
+
+getClassesStdByUser :: Key User -> Handler [Entity Class]
+getClassesStdByUser userId =
+  runDB $ E.select
+            $ E.from
+               $ \(student `E.InnerJoin` clss) -> do
+                    E.on $ (student ^. StudentName  E.==. E.val userId)
+                           E.&&.
+                           (student ^. StudentClass E.==. clss ^. ClassId)
+                    return clss
 
 getClassById :: Key Class -> Handler Class
 getClassById ident = do
@@ -44,6 +61,16 @@ getStudentsByClass classId =
                       (student ^. StudentClass E.==. E.val classId)
                return user
 
+getInstructorsByClass :: Key Class -> Handler [Entity User]
+getInstructorsByClass classId =
+  runDB $ E.select
+          $ E.from
+            $ \(teacher `E.InnerJoin` user) -> do
+               E.on $ (teacher ^. TeacherName  E.==. user ^. UserId)
+                      E.&&.
+                      (teacher ^. TeacherClass E.==. E.val classId)
+               return user
+
 getRawScores :: Key Assignment -> Handler [(Text, Int)]
 getRawScores assignId = do
   scores <- runDB $ selectList [ScoreAssignment ==. assignId] []
@@ -69,28 +96,3 @@ updAssignmentScores assignId scores = do
   _ <- runDB $ deleteWhere [ScoreAssignment ==. assignId]
   _ <- runDB $ insertMany [Score uid assignId pts | (Entity uid _, pts) <- scores]
   return ()
-
-{-
-  getPapersToReview :: Handler [(E.Value (Key Review)
-                               , E.Value PaperStatus
-                               , E.Value Text
-                               , E.Value Text
-                               , E.Value Text)]
-  getPapersToReview = do
-      (uid, _user) <- requireAuthPair
-      runDB
-        $ E.select
-          $ E.from $ \(review `E.InnerJoin` paper) -> do
-                  E.on $ (paper ^. PaperId E.==. review ^. ReviewPaper ) E.&&.
-                         ((paper ^. PaperReady E.==. E.val True)) E.&&.
-                         ((review ^. ReviewUser) E.==. E.val uid)
-                  return
-                      ( review ^. ReviewId
-                      , review ^. ReviewStatus
-                      , review ^. ReviewComments
-                      , paper ^. PaperTitle
-                      , paper ^. PaperAbstract
-                      )
-      return papers
-
--}

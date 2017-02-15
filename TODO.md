@@ -10,6 +10,10 @@
 * Only a student in a class can see the assignments
 * Only a student in a class can see their own scores
 
+## Profile View
+
+- [ ] Allow user to change their name (not their email)
+
 ## Instructor Views
 
 - [x] Class-link in "profile" issues route
@@ -30,7 +34,7 @@
 
 - [x] Add scores for Assignment
 
-- [ ] Add other instructors for class
+- [x] Add other instructors for class
 
 - [ ] Add scores for Assignment  by CSV
 
