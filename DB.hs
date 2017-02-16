@@ -99,11 +99,16 @@ updAssignmentScores assignId scores = do
 
 getScoresByUser :: UserId -> ClassId -> Handler [(Assignment, Int)]
 getScoresByUser userId classId = do
-  ass <- runDB $ E.select
-           $ E.from
-             $ \(assign `E.InnerJoin` score) -> do
-               E.on $ (assign ^. AssignmentClass E.==. E.val classId)
-                      E.&&.
-                      (score  ^. ScoreStudent    E.==. E.val userId)
-               return ( assign, score )
-  return [ (a, scorePoints s) | (Entity _ a, Entity _ s) <- ass ]
+  asgns <- getAssignmentsByClass classId
+  forM asgns $ \ (Entity asgnId a) -> do
+    mbSc  <- runDB $ getBy (UniqueScore userId asgnId)
+    return (a, maybe 0 (scorePoints . entityVal) mbSc)
+
+--  ass <- runDB $ E.select
+--           $ E.from
+--             $ \(assign `E.InnerJoin` score) -> do
+--               E.on $ (assign ^. AssignmentClass E.==. E.val classId)
+--                      E.&&.
+--                      (score  ^. ScoreStudent    E.==. E.val userId)
+--               return ( assign, score )
+--  return [ (a, scorePoints s) | (Entity _ a, Entity _ s) <- ass ]

@@ -33,7 +33,6 @@ getClassInsR classId = do
 
 getClassStdR :: ClassId -> Handler Html
 getClassStdR classId = do
-  -- setMessage "TODO: getClassStdR: HEREHEREHEREHERE"
   (userId, _) <- requireAuthPair
   klass       <- getClassById classId
   scores      <- getScoresByUser userId classId

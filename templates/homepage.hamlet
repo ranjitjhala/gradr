@@ -3,10 +3,8 @@
         <div .row>
             <h1 .header>
                 Gradr
-            <h2>
-                Management, of courses.
             <a href="http://ranjitjhala.github.io" .btn.btn-info.btn-lg>
-                Ranjit Jhala
+                Management, of courses.
 
 <div .container>
 

@@ -101,7 +101,7 @@ instance Yesod App where
                 [ NavbarLeft MenuItem
                     { menuItemLabel          = "Home"
                     , menuItemRoute          = HomeR
-                    , menuItemAccessCallback = True
+                    , menuItemAccessCallback = isNothing muser -- True
                     }
                 , NavbarLeft MenuItem
                     { menuItemLabel          = "Profile"
@@ -195,10 +195,12 @@ instance Yesod App where
 
 -- Define breadcrumbs.
 instance YesodBreadcrumbs App where
-  breadcrumb HomeR     = return ("Home"   , Nothing)
-  breadcrumb (AuthR _) = return ("Login"  , Just HomeR)
-  breadcrumb ProfileR  = return ("Profile", Just HomeR)
-  breadcrumb  _        = return ("home"   , Nothing)
+  breadcrumb HomeR             = return ("Home"      , Nothing)
+  breadcrumb (AuthR _)         = return ("Login"     , Just HomeR)
+  breadcrumb ProfileR          = return ("Profile"   , Just HomeR)
+  breadcrumb (ClassInsR _)     = return ("Class"     , Just ProfileR)
+  breadcrumb (AssignmentR c _) = return ("Assignment", Just (ClassInsR c))
+  breadcrumb  _                = return ("home"      , Nothing)
 
 -- How to run database actions.
 instance YesodPersist App where
@@ -213,11 +215,11 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = HomeR
+    loginDest _ = ProfileR
     -- Where to send a user after logout
     logoutDest _ = HomeR
     -- Override the above two destinations when a Referer: header is present
-    redirectToReferer _ = True
+    redirectToReferer _ = False -- True
 
     -- authenticate creds = runDB $ do
         -- x <- getBy $ UniqueUser $ credsIdent creds
@@ -255,11 +257,12 @@ emailBody action user url = LT.fromStrict $
   url
 
 sendEmail :: Text -> Text -> LT.Text -> IO ()
-sendEmail email subject body = renderSendMail =<< mail
-  where
-    mail = simpleMail to from subject "" body []
-    from = Address (Just "gradr") "rjhala@eng.ucsd.edu"
-    to   = Address Nothing email
+sendEmail email subject body = do
+  let from = Address (Just "gradr") "rjhala@eng.ucsd.edu"
+      to   = Address Nothing email
+  m       <- simpleMail to from subject "" body []
+  putStrLn $ "sending mail: " ++ tshow m
+  renderSendMail m
 
 -- instance YesodJquery App
 
