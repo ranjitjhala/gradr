@@ -10,5 +10,5 @@
   <div .container>
     <div .bs-docs-section>
         <div .col-lg-12>
-            <form .form-horizontal method=post action=@{SettingsR} enctype=#{setEnc}>
+            <form .form-horizontal method=post action=@{EditUserR} enctype=#{setEnc}>
                 ^{setWidget}
