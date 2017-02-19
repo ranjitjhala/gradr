@@ -4,6 +4,13 @@
 
     <hr>
 
+    <h2> Instructors
+      <div .container>
+        <div .bs-docs-section>
+            <div .col-lg-12>
+                <form .form-horizontal method=post action=@{EditClassR} enctype=#{editClsEnc}>
+                    ^{editClsWidget}
+
     <!------------------------------------------------------------------------->
 
     <h2> Instructors
@@ -43,8 +50,6 @@
         <div .bs-callout bs-callout-info well>
           <form .form-horizontal method=post action=@{NewAssignR classId} enctype=#{asgnEnc}>
               ^{asgnWidget}
-              <button .btn.btn-primary type="submit">
-                Add
 
     <hr>
 
@@ -65,5 +70,3 @@
         <div .bs-callout bs-callout-info well>
           <form .form-horizontal method=post action=@{NewStudentR classId} enctype=#{stdEnc}>
               ^{stdWidget}
-              <button .btn.btn-primary type="submit">
-                Add

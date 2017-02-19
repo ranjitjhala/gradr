@@ -8,7 +8,7 @@ import Text.Email.Validate  (isValid)
 import Network.Mail.Mime
 
 -- Used only when in "auth-dummy-login" setting is enabled.
-import Yesod.Auth.Dummy
+-- import Yesod.Auth.Dummy
 import Yesod.Auth.Account
 
 import Yesod.Auth.Message (AuthMessage (InvalidLogin))
@@ -119,6 +119,11 @@ instance Yesod App where
                     , menuItemAccessCallback = isNothing muser
                     }
                 , NavbarRight MenuItem
+                    { menuItemLabel          = "Settings"
+                    , menuItemRoute          = EditUserR
+                    , menuItemAccessCallback = isJust muser
+                    }
+                , NavbarRight MenuItem
                     { menuItemLabel          = "Logout"
                     , menuItemRoute          = AuthR LogoutR
                     , menuItemAccessCallback = isJust muser
@@ -155,7 +160,9 @@ instance Yesod App where
     isAuthorized (StaticR _) _     = return Authorized
 
     isAuthorized ProfileR    _        = isAuthenticated
+    isAuthorized EditUserR _          = isAuthenticated
     isAuthorized NewClassR   _        = isAuthenticated
+    isAuthorized (EditClassR _) _     = isAuthenticated
     isAuthorized (NewAssignR _) _     = isAuthenticated
     isAuthorized (ClassInsR _)  _     = isAuthenticated
     isAuthorized (ClassStdR _)  _     = isAuthenticated
@@ -191,7 +198,6 @@ instance Yesod App where
             || level == LevelError
 
     makeLogger = return . appLogger
-
 
 -- Define breadcrumbs.
 instance YesodBreadcrumbs App where
@@ -237,9 +243,9 @@ instance YesodAuth App where
             Nothing -> UserError InvalidLogin
 
     -- You can add other plugins like Google Email, email or OAuth here
-    authPlugins app = accountPlugin : extraAuthPlugins
+    authPlugins _app = [ accountPlugin ] -- extraAuthPlugins
         -- Enable authDummy login if enabled.
-        where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
+        -- where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
     authHttpManager = getHttpManager
 

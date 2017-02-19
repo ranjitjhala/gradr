@@ -10,17 +10,17 @@
 
 /profile ProfileR GET
 
-/newclass NewClassR GET POST
+/settings EditUserR GET POST
 
-/class/instructor/#ClassId ClassInsR GET
-/class/student/#ClassId    ClassStdR GET
+/class/new                          NewClassR GET POST
+/class/view/instructor/#ClassId     ClassInsR GET
+/class/view/student/#ClassId        ClassStdR GET
+/class/edit/settings/#ClassId       EditClassR      POST
+/class/edit/instructor/#ClassId     NewInstructorR  POST
+/class/edit/student/#ClassId        NewStudentR     POST
 
-/newassign/#ClassId NewAssignR POST
+/assign/new/#ClassId                NewAssignR      POST
+/assign/view/#ClassId/#AssignmentId AssignmentR     GET
+/assign/edit/#ClassId/#AssignmentId EditAssignmentR POST
 
-/newstudent/#ClassId NewStudentR POST
-
-/newinstructor/#ClassId NewInstructorR POST
-
-/assignment/#ClassId/#AssignmentId AssignmentR GET
-
-/score/#ClassId/#AssignmentId ScoreR POST
+/score/#ClassId/#AssignmentId       ScoreR POST

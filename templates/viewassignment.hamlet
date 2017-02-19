@@ -24,5 +24,3 @@
         <div .bs-callout bs-callout-info well>
           <form .form-horizontal method=post action=@{ScoreR classId assignId} enctype=#{stdEnc}>
               ^{stdWidget}
-              <button .btn.btn-primary type="submit">
-                Update

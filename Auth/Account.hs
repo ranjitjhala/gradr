@@ -1,7 +1,8 @@
 module Auth.Account where
 
-import Import.NoFoundation
-import Yesod.Auth.Account
+import           Import.NoFoundation
+import           Yesod.Auth.Account
+import           Yesod.Form.Bootstrap3 -- (bfs)
 import qualified Yesod.Auth.Message as Msg
 import qualified Data.Text as T
 
@@ -44,22 +45,22 @@ data CustomNewAccountData = CustomNewAccountData
 -- | Custom form for creating a new account
 customNewAccountForm :: (MonadHandler m, RenderMessage (HandlerSite m) FormMessage)
                         => AForm m CustomNewAccountData
-customNewAccountForm = CustomNewAccountData <$> areq textField     "Email"            Nothing
-                                            <*> areq textField     "Name"             Nothing
-                                            <*> areq passwordField "Password"         Nothing
-                                            <*> areq passwordField "Confirm Password" Nothing
+customNewAccountForm = CustomNewAccountData
+  <$> areq textField     (bfs ("Email"            :: Text)) Nothing
+  <*> areq textField     (bfs ("Name"             :: Text)) Nothing
+  <*> areq passwordField (bfs ("Password"         :: Text)) Nothing
+  <*> areq passwordField (bfs ("Confirm Password" :: Text)) Nothing
+  <*  bootstrapSubmit    (BootstrapSubmit ("Register" :: Text) "btn-default" [("attribute-name","attribute-value")])
+
+
 -- | The registration form
 customNewAccountWidget :: YesodAuthAccount db master
                           => (Route Auth -> Route master)
                           -> WidgetT master IO ()
 customNewAccountWidget tm = do
-    ((_,widget), enctype) <- liftHandlerT $ runFormPost $ renderDivs customNewAccountForm
-    [whamlet|
-<div .newaccountDiv>
-    <form method=post enctype=#{enctype} action=@{tm newAccountR}>
-        ^{widget}
-        <input type=submit value=_{Msg.Register}>
-|]
+  -- ORIG ((_,widget), enctype) <- liftHandlerT $ runFormPost $ renderDivs customNewAccountForm
+  (widget, enctype) <- generateFormPost $ renderForm customNewAccountForm
+  $(widgetFile "newaccount")
 
 -- | Creates a new custom account
 createNewCustomAccount :: YesodAuthAccount db master

@@ -1,0 +1,9 @@
+  <div .container>
+    <div .bs-docs-section>
+
+        <h1>New Account
+
+        <div .col-lg-6>
+           <div .newaccountDiv>
+             <form class="form-horizontal" method=post enctype=#{enctype} action=@{tm newAccountR}>
+                 ^{widget}

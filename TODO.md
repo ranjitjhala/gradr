@@ -9,7 +9,7 @@
 [hack in isAuthorized]
 
 - [ ] Only an instructor can add assignments
-- [ ] Only an instructor can add teaches
+- [ ] Only an instructor can add teachers
 - [ ] Only an instructor can add students
 - [ ] Only an instructor can view the students in a class
 - [ ] Only an instructor can view the assignments in a class
@@ -22,9 +22,10 @@
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
 
-- [ ] PROFILE Edit User       [name]          <<<< HEREHEREHEREHEREHERE
+- [ ] PROFILE Edit User       [name]          <<<< HEREHEREHEREHERE
 - [ ] CLASS   Edit Class      [name, term]
 - [ ] CLASS   Edit Assignment [name, points]
+
 - [ ] CLASS   Delete Assignment
 - [ ] CLASS   Delete Teacher
 - [ ] ASSIGN  Add scores   by CSV

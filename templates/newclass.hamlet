@@ -4,5 +4,3 @@
       <div .bs-callout bs-callout-info well>
         <form .form-horizontal method=post action=@{NewClassR} enctype=#{formEnctype}>
           ^{formWidget}
-          <button .btn.btn-primary type="submit">
-            Create Class!

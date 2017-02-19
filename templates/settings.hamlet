@@ -1,0 +1,14 @@
+<div .ui.container>
+
+  <h1> Edit Settings
+
+  <br>
+  <hr>
+
+  <!--------------------------------------------------------------------------->
+
+  <div .container>
+    <div .bs-docs-section>
+        <div .col-lg-12>
+            <form .form-horizontal method=post action=@{SettingsR} enctype=#{setEnc}>
+                ^{setWidget}

@@ -11,8 +11,37 @@ import qualified Auth.Account as Auth
 -- import Data.Conduit.Binary
 
 -- import Yesod.Form.MassInput
-import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
+-- import qualified Yesod.Form.Bootstrap3 as BS3 -- (BootstrapSubmit, BootstrapFormLayout (..), renderBootstrap3)
 -- import Yesod.Form.Jquery (jqueryAutocompleteField)
+
+--------------------------------------------------------------------------------
+-- | Viewing/Changing User Settings --------------------------------------------
+--------------------------------------------------------------------------------
+getEditUserR :: Handler Html
+getEditUserR = do
+  (_, user)           <- requireAuthPair
+  (setWidget, setEnc) <- generateFormPost (settingsForm user)
+  defaultLayout $ do
+    setTitle . toHtml $ userIdent user <> "'s Settings page"
+    $(widgetFile "settings")
+
+postEditUserR :: Handler Html
+postEditUserR = do
+  (uid, u)       <- requireAuthPair
+  ((result,_),_) <- runFormPost (settingsForm u)
+  case result of
+    FormSuccess o -> DB.updUserIdent uid (setName o)
+    _             -> setMessage "Something went wrong!"
+  redirect ProfileR
+
+data SettingsForm = SettingsForm
+  { setName :: Text }
+  deriving (Show)
+
+settingsForm :: User -> Form SettingsForm
+settingsForm u = renderForm $ SettingsForm
+  <$> areq textField  "Name"  (Just (userIdent u))
+  <*  submitButton "Update"
 
 --------------------------------------------------------------------------------
 -- | Viewing Existing Classes --------------------------------------------------
@@ -100,8 +129,8 @@ addAssignR classId (NewAssignForm aName aPts) = do
   setMessage $ "Added new assignment: " ++ TB.text aName
 
 scoreForm :: [(Entity User, Int)] -> Form [(Text, Int)]
-scoreForm scores = renderBootstrap3 BootstrapBasicForm
-                     $ sequenceA $ map userForm scores
+scoreForm scores = renderForm (sequenceA (userForm <$> scores) <* submitButton "Submit")
+  -- BS3.bootstrapSubmit (BS3.BootstrapSubmit ("Submit" :: Text) "btn-default" [("attribute-name","attribute-value")])
   where
     userForm (user, score) = (,) <$> pure email
                                  <*> areq intField (textString email) (Just score)
@@ -124,9 +153,10 @@ data NewAssignForm = NewAssignForm
   deriving (Show)
 
 newAssignForm :: Form NewAssignForm
-newAssignForm = renderBootstrap3 BootstrapBasicForm $ NewAssignForm
-  <$> areq textField "Name"   Nothing -- (Just "e.g. HW 1")
-  <*> areq intField  "Points" Nothing -- (Just 10)
+newAssignForm = renderForm $ NewAssignForm
+  <$> areq textField "Name"   Nothing
+  <*> areq intField  "Points" Nothing
+  <*  submitButton   "Create"
 
 --------------------------------------------------------------------------------
 -- | Enrolling New Students ----------------------------------------------------
@@ -136,8 +166,9 @@ data AddUserForm = AddUserForm
   deriving (Show)
 
 addUserForm :: Form AddUserForm
-addUserForm = renderBootstrap3 BootstrapBasicForm $ AddUserForm
+addUserForm = renderForm $ AddUserForm
   <$> areq textField "Email" Nothing
+  <*  submitButton   "Enroll"
 
 postNewStudentR :: ClassId -> Handler Html
 postNewStudentR classId =
@@ -212,6 +243,7 @@ getNewClassR = do
     $(widgetFile "newclass")
 
 newClassForm :: Form NewClassForm
-newClassForm = renderBootstrap3 BootstrapBasicForm $ NewClassForm
-    <$> areq textField "Name" Nothing -- (Just "CSE 130: Programming Languages")
-    <*> areq textField "Term" Nothing -- (Just "Fall 2017")
+newClassForm = renderForm $ NewClassForm
+    <$> areq textField "Name" Nothing
+    <*> areq textField "Term" Nothing
+    <*  submitButton "Create"

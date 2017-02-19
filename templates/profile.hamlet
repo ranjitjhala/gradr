@@ -1,31 +1,31 @@
-<div .ui.container>
+  <div .container>
+    <div .bs-docs-section>
+        <div .col-lg-12>
 
-  <p> Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
+           <p> Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
 
-  <p> However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
+           <p> However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
 
-  <hr>
+           <hr>
 
-  <!--------------------------------------------------------------------------->
+           <!--------------------------------------------------------------------------->
 
-  $if not $ null insClasses
+           $if not $ null insClasses
 
-    <h2> Teaching
+             <h2> Teaching
 
-    <ul>
-      $forall (Entity classId (Class name term _)) <- insClasses
-        <li> <a href=@{ClassInsR classId}> #{name}, #{term} </a>
+             <ul>
+               $forall (Entity classId (Class name term _)) <- insClasses
+                 <li> <a href=@{ClassInsR classId}> #{name}, #{term} </a>
 
-  <hr>
+           <!--------------------------------------------------------------------------->
 
-  <!--------------------------------------------------------------------------->
+           $if not $ null stdClasses
 
-  $if not $ null stdClasses
+             <h2> Taking
 
-    <h2> Taking
+             <ul>
+               $forall (Entity classId (Class name term _)) <- stdClasses
+                 <li> <a href=@{ClassStdR classId}> #{name}, #{term} </a>
 
-    <ul>
-      $forall (Entity classId (Class name term _)) <- stdClasses
-        <li> <a href=@{ClassStdR classId}> #{name}, #{term} </a>
-
-  <hr>
+           <hr>
