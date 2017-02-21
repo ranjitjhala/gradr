@@ -30,7 +30,7 @@ postEditUserR = do
   (uid, u)       <- requireAuthPair
   ((result,_),_) <- runFormPost (settingsForm u)
   case result of
-    FormSuccess o -> DB.updUserIdent uid (setName o)
+    FormSuccess o -> DB.updUser uid (setName o)
     _             -> setMessage "Something went wrong!"
   redirect ProfileR
 
@@ -54,9 +54,10 @@ getClassInsR classId = do
   students              <- getStudentsByClass    classId
   teachers              <- fmap entityVal <$> getInstructorsByClass classId
   let instructors        = instr : teachers
-  (asgnWidget, asgnEnc) <- generateFormPost newAssignForm
+  (asgnWidget, asgnEnc) <- generateFormPost assignForm
   (stdWidget,  stdEnc)  <- generateFormPost addUserForm
   (insWidget,  insEnc)  <- generateFormPost addUserForm
+  (clsWidget,  clsEnc)  <- generateFormPost classForm
   defaultLayout $
     $(widgetFile "viewClassInstructor")
 
@@ -75,8 +76,33 @@ getAssignmentR classId assignId = do
   asgn                <- getAssignmentById assignId
   scores              <- getAssignmentScores classId assignId
   (stdWidget, stdEnc) <- generateFormPost (scoreForm scores)
+  (asgWidget, asgEnc) <- generateFormPost assignForm
   defaultLayout $
     $(widgetFile "viewassignment")
+
+--------------------------------------------------------------------------------
+-- | Edit Name/Term for Class --------------------------------------------------
+--------------------------------------------------------------------------------
+postEditClassR :: ClassId -> Handler Html
+postEditClassR classId =
+  extendClassFormR
+    "edit class name"
+    classForm
+    (\cf -> DB.updClass classId (cName cf) (cTerm cf))
+    classId
+    (ClassInsR classId)
+
+--------------------------------------------------------------------------------
+-- | Edit Name/Points for Assignment -------------------------------------------
+--------------------------------------------------------------------------------
+postEditAssignmentR :: ClassId -> AssignmentId -> Handler Html
+postEditAssignmentR classId asgnId =
+  extendClassFormR
+    "edit assignment"
+    assignForm
+    (\af -> DB.updAssign asgnId (asgnName af) (asgnPoints af))
+    classId
+    (AssignmentR classId asgnId)
 
 --------------------------------------------------------------------------------
 -- | Update Scores for Assignment ----------------------------------------------
@@ -118,13 +144,13 @@ postNewAssignR :: ClassId -> Handler Html
 postNewAssignR classId =
   extendClassFormR
     "create assignment"
-    newAssignForm
+    assignForm
     (addAssignR classId)
     classId
     (ClassInsR classId)
 
-addAssignR :: ClassId -> NewAssignForm -> Handler ()
-addAssignR classId (NewAssignForm aName aPts) = do
+addAssignR :: ClassId -> AssignForm -> Handler ()
+addAssignR classId (AssignForm aName aPts) = do
   _ <- runDB $ insert $ Assignment aName aPts classId
   setMessage $ "Added new assignment: " ++ TB.text aName
 
@@ -146,17 +172,17 @@ dummyScores = [ ("Michael", 26)
               , ("Robert" , 19)
               ]
 
-data NewAssignForm = NewAssignForm
+data AssignForm = AssignForm
   { asgnName   :: Text
   , asgnPoints :: Int
   }
   deriving (Show)
 
-newAssignForm :: Form NewAssignForm
-newAssignForm = renderForm $ NewAssignForm
+assignForm :: Form AssignForm
+assignForm = renderForm $ AssignForm
   <$> areq textField "Name"   Nothing
   <*> areq intField  "Points" Nothing
-  <*  submitButton   "Create"
+  <*  submitButton   "Submit"
 
 --------------------------------------------------------------------------------
 -- | Enrolling New Students ----------------------------------------------------
@@ -217,18 +243,18 @@ extendClassFormR msg form extR classId r = do
 --------------------------------------------------------------------------------
 -- | Creating New Classes ------------------------------------------------------
 --------------------------------------------------------------------------------
-data NewClassForm = NewClassForm
-    { name       :: Text
-    , term       :: Text
+data ClassForm = ClassForm
+    { cName :: Text
+    , cTerm :: Text
     }
     deriving (Show)
 
 postNewClassR :: Handler Html
 postNewClassR = do
   (uid    , _)     <- requireAuthPair
-  ((result, _), _) <- runFormPost newClassForm
+  ((result, _), _) <- runFormPost classForm
   case result of
-    FormSuccess (NewClassForm cName cTerm) -> do
+    FormSuccess (ClassForm cName cTerm) -> do
       _ <- runDB $ insert $ Class cName cTerm uid
       setMessage $ "Added new class! " ++ TB.text cName ++ " in term " ++ TB.text cTerm
       redirect ProfileR
@@ -238,12 +264,12 @@ postNewClassR = do
 
 getNewClassR :: Handler Html
 getNewClassR = do
-  (formWidget, formEnctype) <- generateFormPost newClassForm
+  (formWidget, formEnctype) <- generateFormPost classForm
   defaultLayout $
     $(widgetFile "newclass")
 
-newClassForm :: Form NewClassForm
-newClassForm = renderForm $ NewClassForm
+classForm :: Form ClassForm
+classForm = renderForm $ ClassForm
     <$> areq textField "Name" Nothing
     <*> areq textField "Term" Nothing
-    <*  submitButton "Create"
+    <*  submitButton "Submit"

@@ -22,12 +22,9 @@
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
 
-- [ ] PROFILE Edit User       [name]          <<<< HEREHEREHEREHERE
-- [ ] CLASS   Edit Class      [name, term]
-- [ ] CLASS   Edit Assignment [name, points]
-
-- [ ] CLASS   Delete Assignment
+- [ ] CLASS   Delete Assignment    <<<< HEREHEREHEREHERE
 - [ ] CLASS   Delete Teacher
+
 - [ ] ASSIGN  Add scores   by CSV
 - [ ] CLASS   Add students by CSV
 - [ ] CLASS   Get scores   by CSV

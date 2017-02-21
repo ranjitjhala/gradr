@@ -84,8 +84,20 @@ getAssignmentScores classId assignId = do
   rawScores <- getRawScores assignId
   return     $ updScores [ (u, 0) | u <- students ] rawScores
 
-updUserIdent :: UserId -> Text -> Handler ()
-updUserIdent uid name = runDB $ update uid [UserIdent =. name]
+updUser :: UserId -> Text -> Handler ()
+updUser uid name = runDB $
+  update uid [UserIdent =. name]
+
+updClass :: ClassId -> Text -> Text -> Handler ()
+updClass cId cName cTerm = runDB $
+  update cId [ ClassName =. cName
+             , ClassTerm =. cTerm ]
+
+updAssign :: AssignmentId -> Text -> Int -> Handler ()
+updAssign aId aName aPts = runDB $
+  update aId [ AssignmentName   =. aName
+             , AssignmentPoints =. aPts ]
+
 
 updScores :: [(Entity User, Int)] -> [(Text, Int)] -> [(Entity User, Int)]
 updScores us ens = [ (fst u, score u) | u <- us ]

@@ -163,6 +163,7 @@ instance Yesod App where
     isAuthorized EditUserR _          = isAuthenticated
     isAuthorized NewClassR   _        = isAuthenticated
     isAuthorized (EditClassR _) _     = isAuthenticated
+    isAuthorized (EditAssignmentR _ _) _ = isAuthenticated
     isAuthorized (NewAssignR _) _     = isAuthenticated
     isAuthorized (ClassInsR _)  _     = isAuthenticated
     isAuthorized (ClassStdR _)  _     = isAuthenticated

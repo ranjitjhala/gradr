@@ -6,6 +6,18 @@
 
     <h2> #{assignmentName asgn} (#{assignmentPoints asgn} Points)
 
+
+    <hr>
+
+    <h2> Edit
+      <div .container>
+        <div .bs-docs-section>
+            <div .col-lg-12>
+                <form .form-horizontal method=post action=@{EditAssignmentR classId assignId} enctype=#{asgEnc}>
+                    ^{asgWidget}
+
+    <hr>
+
     <table>
       <tr>
         <td><b>Student &nbsp;
