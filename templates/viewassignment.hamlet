@@ -6,7 +6,6 @@
 
     <h2> #{assignmentName asgn} (#{assignmentPoints asgn} Points)
 
-
     <hr>
 
     <h2> Edit
