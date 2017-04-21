@@ -1,0 +1,23 @@
+    <h2> Instructor
+
+    #{userIdent instructor} (#{userEmailAddress instructor})
+
+    <br>
+
+    <h2> Teachers
+
+    <table class="table">
+        <tbody>
+        $forall (Entity userId u) <- teachers
+          <tr>
+            <td> #{userIdent u} &nbsp;
+            <td> #{userEmailAddress u} &nbsp;
+            <td> <a href=@{DelInsR classId userId}>remove</a>
+
+    <h3> Add
+
+        <div .bs-callout bs-callout-info well>
+          <form .form-horizontal method=post action=@{NewInstructorR classId} enctype=#{insEnc}>
+              ^{insWidget}
+
+    <hr>

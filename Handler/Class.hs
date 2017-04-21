@@ -49,17 +49,17 @@ settingsForm u = renderForm $ SettingsForm
 getClassInsR :: ClassId -> Handler Html
 getClassInsR classId = do
   klass                 <- getClassById classId
-  instr                 <- getUserById (classInstructor klass)
+  instructor            <- getUserById (classInstructor klass)
   asgns                 <- getAssignmentsByClass classId
   students              <- getStudentsByClass    classId
-  teachers              <- fmap entityVal <$> getInstructorsByClass classId
-  let instructors        = instr : teachers
+  teachers              <- getInstructorsByClass classId
   (asgnWidget, asgnEnc) <- generateFormPost assignForm
   (stdWidget,  stdEnc)  <- generateFormPost addUserForm
   (insWidget,  insEnc)  <- generateFormPost addUserForm
   (clsWidget,  clsEnc)  <- generateFormPost classForm
   defaultLayout $
     $(widgetFile "viewClassInstructor")
+
 
 getClassStdR :: ClassId -> Handler Html
 getClassStdR classId = do
@@ -118,6 +118,27 @@ postScoreR classId assignId = do
     (AssignmentR classId assignId)
 
 --------------------------------------------------------------------------------
+-- | Deleting Instructors/Students from a Class --------------------------------
+--------------------------------------------------------------------------------
+getDelInsR :: ClassId -> UserId -> Handler Html
+getDelInsR classId userId =
+  extendClassHandleR
+    "remove teacher"
+    (return (Just userId))
+    (DB.delTeacher classId)
+    classId
+    (ClassInsR classId)
+
+getDelStdR :: ClassId -> UserId -> Handler Html
+getDelStdR classId userId =
+  extendClassHandleR
+    "remove student"
+    (return (Just userId))
+    (DB.delStudent classId)
+    classId
+    (ClassInsR classId)
+
+--------------------------------------------------------------------------------
 -- | Adding New Instructors ----------------------------------------------------
 --------------------------------------------------------------------------------
 postNewInstructorR :: ClassId -> Handler Html
@@ -135,7 +156,8 @@ addInstructorR classId userForm = do
   case mbStd of
     Nothing ->    setMessage $ "Error adding instructor: " ++ TB.text (auEmail userForm)
     Just e  -> do setMessage $ "Added instructor: "        ++ TB.text (auEmail userForm)
-                  void $ runDB (insert (Teacher (entityKey e) classId))
+                  void $ updTeacher classId (entityKey e)
+                  -- runDB (insert (Teacher (entityKey e) classId))
 
 --------------------------------------------------------------------------------
 -- | Creating New Assignments --------------------------------------------------
@@ -226,19 +248,36 @@ addUserR classId (AddUserForm sEmail) = do
 --------------------------------------------------------------------------------
 -- | Generic Class Extension ---------------------------------------------------
 --------------------------------------------------------------------------------
-extendClassFormR
-  :: Html -> Form a -> (a -> Handler ()) -> ClassId -> Route App -> Handler Html
-extendClassFormR msg form extR classId r = do
+extendClassFormR :: Html
+                 -> Form a
+                 -> (a -> Handler ())
+                 -> ClassId
+                 -> Route App
+                 -> Handler Html
+extendClassFormR msg form =
+  extendClassHandleR msg (runFormHandler form)
+
+runFormHandler :: Form a -> Handler (Maybe a)
+runFormHandler form = do
+  ((result,_),_) <- runFormPost form
+  case result of
+    FormSuccess o -> return (Just o)
+    _             -> return Nothing
+
+extendClassHandleR
+  :: Html -> Handler (Maybe a) -> (a -> Handler ()) -> ClassId -> Route App -> Handler Html
+extendClassHandleR msg h extR classId r = do
   instrId      <- classInstructor <$> getClassById classId
   (uid    , _) <- requireAuthPair
   if uid /= instrId
     then setMessage ("Sorry, can only " ++ msg ++ "for your own class!")
     else do
-      ((result, _), _) <- runFormPost form
+      result <- h
       case result of
-        FormSuccess o -> extR o
-        _             -> setMessage "Something went wrong!"
+        Just o -> extR o
+        _      -> setMessage "Something went wrong!"
   redirect r
+
 
 --------------------------------------------------------------------------------
 -- | Creating New Classes ------------------------------------------------------
@@ -273,3 +312,19 @@ classForm = renderForm $ ClassForm
     <$> areq textField "Name" Nothing
     <*> areq textField "Term" Nothing
     <*  submitButton "Submit"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+classEditWidget classId clsEnc clsWidget
+  = $(widgetFile "classEdit")
+
+classInstructors classId instructor teachers insEnc insWidget
+  = $(widgetFile "classInstructors")
+
+classAssignments classId asgns asgnEnc asgnWidget
+  = $(widgetFile "classAssignments")
+
+classStudents classId students stdEnc stdWidget
+  = $(widgetFile "classStudents")

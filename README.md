@@ -23,12 +23,11 @@ Web application for managing grades
 
 ### Views
 
+- [ ] ASSIGN  Add scores   by CSV     
+- [ ] CLASS   Add students by CSV     <<<<    HEREHEREHEREHERE
+- [ ] CLASS   Get scores   by CSV
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
-- [ ] CLASS   Delete Teacher      <<<< HEREHEREHEREHERE
-- [ ] CLASS   Delete Assignment   
-- [ ] ASSIGN  Add scores   by CSV
-- [ ] CLASS   Add students by CSV
-- [ ] CLASS   Get scores   by CSV
+- [ ] CLASS   Delete Assignment
 
 [upload]: http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file

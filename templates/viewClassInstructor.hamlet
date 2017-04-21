@@ -4,67 +4,22 @@
 
     <hr>
 
-    <h2> Edit
-      <div .container>
-        <div .bs-docs-section>
-            <div .col-lg-12>
-                <form .form-horizontal method=post action=@{EditClassR classId} enctype=#{clsEnc}>
-                    ^{clsWidget}
+    <ul .nav.nav-tabs>
+        <li .active><a data-toggle="pill" href="#tab-edit">Edit</a></li>
+        <li><a data-toggle="pill" href="#tab-instructors">Instructors</a></li>
+        <li><a data-toggle="pill" href="#tab-assignments">Assignments</a></li>
+        <li><a data-toggle="pill" href="#tab-students">Students</a></li>
 
-    <!------------------------------------------------------------------------->
+    <div .tab-content>
 
-    <h2> Instructors
+        <div .tab-pane.fade.in.active id="tab-edit">
+            ^{classEditWidget classId clsEnc clsWidget}
 
-    <br>
+        <div .tab-pane.fade id="tab-instructors">
+            ^{classInstructors classId instructor teachers insEnc insWidget}
 
-    <ul>
-      $forall u <- instructors
-        <li> #{userIdent u} : #{userEmailAddress u}
+        <div .tab-pane.fade id="tab-assignments">
+            ^{classAssignments classId asgns asgnEnc asgnWidget}
 
-    <br>
-
-    <h3> Add
-
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewInstructorR classId} enctype=#{insEnc}>
-              ^{insWidget}
-
-    <hr>
-
-    <!------------------------------------------------------------------------->
-
-    <h2> Assignments
-
-    <br>
-
-    <ul>
-      $forall (Entity assignId (Assignment aName aPts _)) <- asgns
-        <li> <a href=@{AssignmentR classId assignId}> #{aName} : #{aPts} points </a>
-
-    <br>
-
-    <h3> Add
-
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewAssignR classId} enctype=#{asgnEnc}>
-              ^{asgnWidget}
-
-    <hr>
-
-    <!------------------------------------------------------------------------->
-
-    <h2> Students
-
-    <br>
-
-    <ul>
-      $forall (Entity _ u) <- students
-        <li> #{userIdent u} : #{userEmailAddress u}
-
-    <br>
-
-    <h3> Add
-
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewStudentR classId} enctype=#{stdEnc}>
-              ^{stdWidget}
+        <div .tab-pane.fade id="tab-students">
+            ^{classStudents classId students stdEnc stdWidget}

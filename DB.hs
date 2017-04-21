@@ -98,6 +98,19 @@ updAssign aId aName aPts = runDB $
   update aId [ AssignmentName   =. aName
              , AssignmentPoints =. aPts ]
 
+updTeacher :: ClassId -> UserId -> Handler TeacherId
+updTeacher classId userId = runDB $
+  insert (Teacher userId classId)
+
+delTeacher :: ClassId -> UserId -> Handler ()
+delTeacher classId userId = runDB $
+  deleteWhere [ TeacherClass ==. classId
+              , TeacherName  ==. userId ]
+
+delStudent :: ClassId -> UserId -> Handler ()
+delStudent classId userId = runDB $
+  deleteWhere [ StudentClass ==. classId
+              , StudentName  ==. userId ]
 
 updScores :: [(Entity User, Int)] -> [(Text, Int)] -> [(Entity User, Int)]
 updScores us ens = [ (fst u, score u) | u <- us ]

@@ -172,6 +172,8 @@ instance Yesod App where
     isAuthorized (NewStudentR _) _    = isAuthenticated
     isAuthorized (NewInstructorR _) _ = isAuthenticated
     isAuthorized (ScoreR _ _) _       = isAuthenticated
+    isAuthorized (DelInsR _ _) _      = isAuthenticated
+    isAuthorized (DelStdR _ _) _      = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows

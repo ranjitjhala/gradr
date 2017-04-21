@@ -1,0 +1,18 @@
+
+    <h2> Assignments
+
+    <br>
+
+    <ul>
+      $forall (Entity assignId (Assignment aName aPts _)) <- asgns
+        <li> <a href=@{AssignmentR classId assignId}> #{aName} : #{aPts} points </a>
+
+    <br>
+
+    <h3> Add
+
+        <div .bs-callout bs-callout-info well>
+          <form .form-horizontal method=post action=@{NewAssignR classId} enctype=#{asgnEnc}>
+              ^{asgnWidget}
+
+    <hr>

@@ -12,15 +12,18 @@
 
 /settings EditUserR GET POST
 
-/class/new                          NewClassR GET POST
-/class/view/instructor/#ClassId     ClassInsR GET
-/class/view/student/#ClassId        ClassStdR GET
-/class/edit/settings/#ClassId       EditClassR      POST
-/class/edit/instructor/#ClassId     NewInstructorR  POST
-/class/edit/student/#ClassId        NewStudentR     POST
+/class/new                                NewClassR       GET POST
+/class/view/instructor/#ClassId           ClassInsR       GET
+/class/view/student/#ClassId              ClassStdR       GET
+/class/edit/settings/#ClassId             EditClassR      POST
+/class/edit/instructor/#ClassId           NewInstructorR  POST
+/class/edit/student/#ClassId              NewStudentR     POST
 
-/assign/new/#ClassId                NewAssignR      POST
-/assign/view/#ClassId/#AssignmentId AssignmentR     GET
-/assign/edit/#ClassId/#AssignmentId EditAssignmentR POST
+/class/del/instructor/#ClassId/#UserId    DelInsR         GET
+/class/del/student/#ClassId/#UserId       DelStdR         GET
 
-/score/#ClassId/#AssignmentId       ScoreR POST
+/assign/new/#ClassId                      NewAssignR      POST
+/assign/view/#ClassId/#AssignmentId       AssignmentR     GET
+/assign/edit/#ClassId/#AssignmentId       EditAssignmentR POST
+
+/score/#ClassId/#AssignmentId             ScoreR POST
