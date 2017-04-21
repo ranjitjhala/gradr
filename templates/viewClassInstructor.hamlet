@@ -28,8 +28,6 @@
         <div .bs-callout bs-callout-info well>
           <form .form-horizontal method=post action=@{NewInstructorR classId} enctype=#{insEnc}>
               ^{insWidget}
-              <button .btn.btn-primary type="submit">
-                Add
 
     <hr>
 

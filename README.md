@@ -25,8 +25,8 @@ Web application for managing grades
 
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
-- [ ] CLASS   Delete Assignment    <<<< HEREHEREHEREHERE
-- [ ] CLASS   Delete Teacher
+- [ ] CLASS   Delete Teacher      <<<< HEREHEREHEREHERE
+- [ ] CLASS   Delete Assignment   
 - [ ] ASSIGN  Add scores   by CSV
 - [ ] CLASS   Add students by CSV
 - [ ] CLASS   Get scores   by CSV

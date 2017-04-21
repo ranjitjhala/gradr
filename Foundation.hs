@@ -15,6 +15,7 @@ import Yesod.Auth.Message (AuthMessage (InvalidLogin))
 -- import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
+import qualified Yesod.Auth.Message as Msg
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
@@ -244,7 +245,7 @@ instance YesodAuth App where
             Nothing -> UserError InvalidLogin
 
     -- You can add other plugins like Google Email, email or OAuth here
-    authPlugins _app = [ accountPlugin ] -- extraAuthPlugins
+    authPlugins _app = [ accountPluginCustom ] -- [ accountPlugin ] -- extraAuthPlugins
         -- Enable authDummy login if enabled.
         -- where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
@@ -273,6 +274,15 @@ sendEmail email subject body = do
 
 -- instance YesodJquery App
 
+accountPluginCustom :: YesodAuthAccount db master => AuthPlugin master
+accountPluginCustom = AuthPlugin "account" (apDispatch accountPlugin) myLoginWidget
+
+
+myLoginWidget :: YesodAuthAccount db master => (Route Auth -> Route master) -> WidgetT master IO ()
+myLoginWidget tm = do
+    ((_,widget), enctype) <- liftHandlerT $ runFormPostNoToken $ Auth.customLoginForm
+    $(widgetFile "login")
+
 instance YesodAuthAccount (AccountPersistDB App User) App where
   runAccountDB = runAccountPersistDB
   getNewAccountR = Auth.getNewAccountR
@@ -281,6 +291,16 @@ instance YesodAuthAccount (AccountPersistDB App User) App where
   checkValidUsername _ = do
     mr <- getMessageRender
     return $ Left $ mr InvalidLogin
+
+
+  -- | Page to prompt for a username and send an email to reset password.
+  getResetPasswordR = do
+    tm <- getRouteToParent
+    lift $ defaultLayout $ do
+      setTitleI Msg.PasswordResetTitle
+      -- ((_,widget), enctype) <- liftHandlerT $ runFormPost $ renderDivs resetPasswordForm
+      ((_,widget), enctype) <- liftHandlerT $ runFormPostNoToken $ Auth.customResetForm
+      $(widgetFile "reset-password")
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult

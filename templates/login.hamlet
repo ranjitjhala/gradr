@@ -1,0 +1,12 @@
+<div .container>
+  <h2> Gradr Login
+  <div .col-lg-4>
+    <div .well.bs-component>
+      <form .form-horizontal method=post enctype=#{enctype} action=@{tm loginFormPostTargetR}>
+          ^{widget}
+          <button .btn.btn-primary type="submit">
+            Login
+          <a .btn.btn-secondary" href="@{tm newAccountR}" role="button">
+            New Account
+          <a .btn.btn-secondary" href="@{tm resetPasswordR}" role="button">
+            Forgot Password?

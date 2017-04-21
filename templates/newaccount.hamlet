@@ -1,9 +1,7 @@
-  <div .container>
-    <div .bs-docs-section>
-
-        <h1>New Account
-
-        <div .col-lg-6>
-           <div .newaccountDiv>
-             <form class="form-horizontal" method=post enctype=#{enctype} action=@{tm newAccountR}>
-                 ^{widget}
+<div .container>
+    <h2> Create an Account
+    <div .col-lg-6>
+        <div .well.bs-component>
+            <form .form-horizontal method=post enctype=#{enctype} action=@{tm newAccountR}>
+                ^{widget}
+                <input .btn.btn-primary type=submit value=_{Msg.Register}>
