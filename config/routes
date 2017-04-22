@@ -30,3 +30,5 @@
 
 /score/#ClassId/#AssignmentId             ScoreR          POST
 /scores/#ClassId/#AssignmentId            ScoresR         POST
+
+/class/export/#ClassId                    ClassExportR    GET           -- export a .csv of all students' scores

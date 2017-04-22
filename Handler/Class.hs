@@ -6,7 +6,7 @@ import           Utils
 import qualified Text.Blaze   as TB
 import qualified Auth.Account as Auth
 import           Text.Read (readMaybe)
-
+import qualified Data.Text.Encoding as T
 -- import qualified Data.Vector  as V
 -- import qualified Data.Csv     as Csv
 -- import qualified Util as Util
@@ -46,6 +46,29 @@ settingsForm :: User -> Form SettingsForm
 settingsForm u = renderForm $ SettingsForm
   <$> areq textField  "Name"  (Just (userIdent u))
   <*  submitButton "Update"
+
+--------------------------------------------------------------------------------
+-- | Export Class Scores to .csv -----------------------------------------------
+--------------------------------------------------------------------------------
+getClassExportR :: ClassId -> Handler TypedContent
+getClassExportR classId = do
+  bytes <- csvBytes <$> classCsv classId
+  addHeader "Content-Disposition" "attachment; filename=\"scores.csv\""
+  sendResponse (T.encodeUtf8 "text/csv", toContent bytes)
+
+data ClassCsv = ClassCsv
+  { csvAsgns  :: Int
+  , csvNames  :: [Text]           -- List Text csvAsgns
+  , csvPoints :: [Int]            -- List Int  csvAsgns
+  , csvScores :: [(Text, [Int])]  -- [(Text, List Int csvAsgns)]
+  }
+  deriving (Show)
+
+classCsv :: ClassId -> Handler ClassCsv
+classCsv = error "TODO:classCsv"
+
+csvBytes :: ClassCsv -> ByteString
+csvBytes = error "TODO:csvBytes"
 
 --------------------------------------------------------------------------------
 -- | Viewing Existing Classes --------------------------------------------------

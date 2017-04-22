@@ -13,7 +13,7 @@
             <tr>
               <td> <a href=@{AssignmentR classId assignId}> #{aName}</a> &nbsp;
               <td> #{aPts} &nbsp;
-              <td> <a .btn.btn-danger href=@{DelAssignmentR classId assignId}>remove</a>
+              <td> <a onclick="return confirm('Are you sure?')" href=@{DelAssignmentR classId assignId}>remove</a>
     <br>
 
     <h3> Add

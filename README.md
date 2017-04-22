@@ -24,14 +24,7 @@ Web application for managing grades
 
 ### Views
 
-- [ ] CLASS   Export scores  by CSV    <<<<    HEREHEREHEREHERE
-- [ ] CLASS   Export class   by CSV   
-- [ ] CLASS   Import class   by CSV   
+- [ ] CLASS   Export class by CSV <<<< HEREHERE (see Download)
+- [ ] CLASS   Import class by CSV   
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
-
-[upload]: http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file
-
-
-[confirm]:
-http://stackoverflow.com/questions/16849117/html-how-to-do-a-confirmation-popup-to-a-submit-button-and-then-send-the-reque

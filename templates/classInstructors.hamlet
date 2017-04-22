@@ -15,7 +15,7 @@
           <tr>
             <td> #{userIdent u} &nbsp;
             <td> #{userEmailAddress u} &nbsp;
-            <td> <a href=@{DelInsR classId userId}>remove</a>
+            <td> <a onclick="return confirm('Are you sure?')" href=@{DelInsR classId userId}>remove</a>
 
     <h3> Add
 
