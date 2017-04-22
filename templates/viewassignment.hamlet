@@ -17,18 +17,19 @@
 
     <hr>
 
-    <table>
-      <tr>
-        <td><b>Student &nbsp;
-        <td><b>Email   &nbsp;
-        <td><b>Score
+    <table class="table">
+        <thead>
+          <tr>
+            <td><b>Student &nbsp;
+            <td><b>Email   &nbsp;
+            <td><b>Score
 
-      $forall (Entity _ user, pts) <- scores
-
-        <tr>
-          <td> #{userIdent        user}
-          <td> #{userEmailAddress user}
-          <td> #{pts}
+        <tbody>
+        $forall (Entity _ user, pts) <- scores
+          <tr>
+            <td> #{userIdent        user}
+            <td> #{userEmailAddress user}
+            <td> #{pts}
 
 
     <h2> Update Scores

@@ -1,10 +1,15 @@
 module Handler.Class where
 
 import           Import
-import qualified Text.Blaze   as TB
 import           DB
+import qualified Text.Blaze   as TB
 import qualified Auth.Account as Auth
+import           Data.Char           (isSpace)
+import           Data.Conduit.Binary (sinkLbs)
+import qualified Data.ByteString.Lazy.Char8 as LB8
 
+-- import qualified Data.Vector  as V
+-- import qualified Data.Csv     as Csv
 -- import qualified Util as Util
 -- import qualified Data.ByteString as S
 -- import qualified Data.ByteString.Lazy as L
@@ -55,6 +60,7 @@ getClassInsR classId = do
   teachers              <- getInstructorsByClass classId
   (asgnWidget, asgnEnc) <- generateFormPost assignForm
   (stdWidget,  stdEnc)  <- generateFormPost addUserForm
+  (csvWidget,  csvEnc)  <- generateFormPost addUsersForm
   (insWidget,  insEnc)  <- generateFormPost addUserForm
   (clsWidget,  clsEnc)  <- generateFormPost classForm
   defaultLayout $
@@ -78,7 +84,7 @@ getAssignmentR classId assignId = do
   (stdWidget, stdEnc) <- generateFormPost (scoreForm scores)
   (asgWidget, asgEnc) <- generateFormPost assignForm
   defaultLayout $
-    $(widgetFile "viewassignment")
+    $(widgetFile "viewAssignment")
 
 --------------------------------------------------------------------------------
 -- | Edit Name/Term for Class --------------------------------------------------
@@ -218,6 +224,28 @@ addUserForm = renderForm $ AddUserForm
   <$> areq textField "Email" Nothing
   <*  submitButton   "Enroll"
 
+data AddUsersForm = AddUsersForm
+  { ausFile :: FileInfo }
+
+addUsersForm :: Form AddUsersForm
+addUsersForm = renderForm $ AddUsersForm
+  <$> areq fileField "Choose File (.csv)" Nothing
+  <*  submitButton   "Upload"
+
+-- Html -> MForm File File (FormResult (FileInfo, Maybe FileInfo), Widget)
+--   <$> areq
+--   form = renderDivs $ (,) <$> fileAFormReq "File" <*> fileAFormOpt "Optional file"
+
+
+postNewStudentsR :: ClassId -> Handler Html
+postNewStudentsR classId =
+  extendClassFormR
+    "enroll student"
+    addUsersForm
+    (addStudentsR classId)
+    classId
+    (ClassInsR classId)
+
 postNewStudentR :: ClassId -> Handler Html
 postNewStudentR classId =
   extendClassFormR
@@ -227,6 +255,24 @@ postNewStudentR classId =
     classId
     (ClassInsR classId)
 
+-- | Enroll multiple students via CSV upload
+addStudentsR :: ClassId -> AddUsersForm -> Handler ()
+addStudentsR classId usersForm = do
+  res <- liftIO $ fileUsers (ausFile usersForm)
+  mapM_ (addStudentR classId) res
+
+fileUsers :: FileInfo -> IO [AddUserForm]
+fileUsers file = do
+  bytes <- runResourceT $ fileSource file $$ sinkLbs
+  return (map stringUser . lines . LB8.unpack $ bytes)
+
+stringUser :: String -> AddUserForm
+stringUser = AddUserForm . fromString . snipSpaces
+
+snipSpaces :: String -> String
+snipSpaces = reverse . dropWhile isSpace . reverse . dropWhile isSpace
+
+-- | Enroll a single student to the class
 addStudentR :: ClassId -> AddUserForm -> Handler ()
 addStudentR classId userForm = do
   mbStd <- addUserR classId userForm
@@ -326,5 +372,5 @@ classInstructors classId instructor teachers insEnc insWidget
 classAssignments classId asgns asgnEnc asgnWidget
   = $(widgetFile "classAssignments")
 
-classStudents classId students stdEnc stdWidget
+classStudents classId students stdEnc stdWidget stdCsvEnc stdCsvWidget
   = $(widgetFile "classStudents")

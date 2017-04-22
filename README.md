@@ -23,9 +23,9 @@ Web application for managing grades
 
 ### Views
 
-- [ ] ASSIGN  Add scores   by CSV     
-- [ ] CLASS   Add students by CSV     <<<<    HEREHEREHEREHERE
-- [ ] CLASS   Get scores   by CSV
+- [ ] ASSIGN  Add scores   by CSV     <<<<    HEREHEREHEREHERE
+- [ ] TABS    viewAssignment Edit | View | Update
+- [ ] CLASS   Export scores   by CSV     
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
 - [ ] CLASS   Delete Assignment

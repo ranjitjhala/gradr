@@ -1,10 +1,13 @@
-    <h2> Instructor
-
-    #{userIdent instructor} (#{userEmailAddress instructor})
 
     <br>
 
-    <h2> Teachers
+    <h3> Instructor
+
+    <h4> #{userIdent instructor} (#{userEmailAddress instructor})
+
+    <br>
+
+    <h3> Teachers
 
     <table class="table">
         <tbody>

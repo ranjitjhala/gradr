@@ -91,11 +91,13 @@ library
                  , fast-logger                   >= 2.2        && < 2.5
                  , wai-logger                    >= 2.2        && < 2.4
                  , file-embed
+                 , conduit-extra
                  , email-validate
                  , safe
                  , unordered-containers
                  , containers
                  , vector
+                 , cassava
                  , time
                  , case-insensitive
                  , wai
@@ -177,3 +179,4 @@ test-suite test
                  , classy-prelude
                  , classy-prelude-yesod
                  , aeson
+                 , cassava

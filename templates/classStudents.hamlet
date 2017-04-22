@@ -12,6 +12,15 @@
             <td> <a href=@{DelStdR classId userId}>remove</a>
     <br>
 
+    <h3> Upload Roster
+
+    <p> Enroll students via a text file, with a single email per line.
+
+        <div .bs-callout bs-callout-info well>
+          <form .form-horizontal method=post action=@{NewStudentsR classId} enctype=#{stdCsvEnc}>
+              ^{stdCsvWidget}
+
+    <br>
 
     <h3> Add
 

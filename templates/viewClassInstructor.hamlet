@@ -22,4 +22,4 @@
             ^{classAssignments classId asgns asgnEnc asgnWidget}
 
         <div .tab-pane.fade id="tab-students">
-            ^{classStudents classId students stdEnc stdWidget}
+            ^{classStudents classId students stdEnc stdWidget csvEnc csvWidget}
