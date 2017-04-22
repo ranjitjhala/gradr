@@ -2,11 +2,10 @@ module Handler.Class where
 
 import           Import
 import           DB
+import           Utils
 import qualified Text.Blaze   as TB
 import qualified Auth.Account as Auth
-import           Data.Char           (isSpace)
-import           Data.Conduit.Binary (sinkLbs)
-import qualified Data.ByteString.Lazy.Char8 as LB8
+import           Text.Read (readMaybe)
 
 -- import qualified Data.Vector  as V
 -- import qualified Data.Csv     as Csv
@@ -60,7 +59,7 @@ getClassInsR classId = do
   teachers              <- getInstructorsByClass classId
   (asgnWidget, asgnEnc) <- generateFormPost assignForm
   (stdWidget,  stdEnc)  <- generateFormPost addUserForm
-  (csvWidget,  csvEnc)  <- generateFormPost addUsersForm
+  (csvWidget,  csvEnc)  <- generateFormPost fileForm
   (insWidget,  insEnc)  <- generateFormPost addUserForm
   (clsWidget,  clsEnc)  <- generateFormPost classForm
   defaultLayout $
@@ -83,6 +82,7 @@ getAssignmentR classId assignId = do
   scores              <- getAssignmentScores classId assignId
   (stdWidget, stdEnc) <- generateFormPost (scoreForm scores)
   (asgWidget, asgEnc) <- generateFormPost assignForm
+  (scoWidget, scoEnc) <- generateFormPost fileForm
   defaultLayout $
     $(widgetFile "viewAssignment")
 
@@ -119,10 +119,38 @@ postScoreR classId assignId = do
   extendClassFormR
     "update scores"
     (scoreForm oldScores)
-    (updAssignmentScores assignId . updScores oldScores)
+    (updAssignmentScores assignId oldScores)
     classId
     (AssignmentR classId assignId)
 
+postScoresR :: ClassId -> AssignmentId -> Handler Html
+postScoresR classId assignId = do
+  oldScores <- getAssignmentScores classId assignId
+  extendClassFormR
+    "update scores by .csv"
+    fileForm
+    (addScoresR classId assignId oldScores)
+    classId
+    (AssignmentR classId assignId)
+
+
+-- | Add multiple scores via CSV upload
+addScoresR :: ClassId -> AssignmentId -> [(Entity User, Int)] -> FileForm -> Handler ()
+addScoresR classId assignId oldScores scoresForm = do
+  res <- liftIO $ fileScores (fFile scoresForm)
+  case res of
+    Left err     -> setMessage $ "Error updating scores: " ++ TB.text (fromString err)
+    Right scores -> updAssignmentScores assignId oldScores scores
+
+fileScores :: FileInfo -> IO (Either String [(Text, Int)])
+fileScores file = sequenceA . map stringScore <$> fileLines file
+
+stringScore :: String -> Either String (Text, Int)
+stringScore s = case stringFields 2 s of
+                  Left err       -> Left err
+                  Right [em, s2] -> case readMaybe s2 of
+                                      Nothing -> Left ("Malformed score: " ++ s)
+                                      Just n  -> Right (fromString em, n)
 --------------------------------------------------------------------------------
 -- | Deleting Instructors/Students from a Class --------------------------------
 --------------------------------------------------------------------------------
@@ -224,24 +252,19 @@ addUserForm = renderForm $ AddUserForm
   <$> areq textField "Email" Nothing
   <*  submitButton   "Enroll"
 
-data AddUsersForm = AddUsersForm
-  { ausFile :: FileInfo }
+data FileForm = FileForm
+  { fFile :: FileInfo }
 
-addUsersForm :: Form AddUsersForm
-addUsersForm = renderForm $ AddUsersForm
-  <$> areq fileField "Choose File (.csv)" Nothing
+fileForm :: Form FileForm
+fileForm = renderForm $ FileForm
+  <$> areq fileField ".csv file" Nothing
   <*  submitButton   "Upload"
-
--- Html -> MForm File File (FormResult (FileInfo, Maybe FileInfo), Widget)
---   <$> areq
---   form = renderDivs $ (,) <$> fileAFormReq "File" <*> fileAFormOpt "Optional file"
-
 
 postNewStudentsR :: ClassId -> Handler Html
 postNewStudentsR classId =
   extendClassFormR
-    "enroll student"
-    addUsersForm
+    "enroll students by .csv"
+    fileForm
     (addStudentsR classId)
     classId
     (ClassInsR classId)
@@ -255,22 +278,22 @@ postNewStudentR classId =
     classId
     (ClassInsR classId)
 
+
 -- | Enroll multiple students via CSV upload
-addStudentsR :: ClassId -> AddUsersForm -> Handler ()
+addStudentsR :: ClassId -> FileForm -> Handler ()
 addStudentsR classId usersForm = do
-  res <- liftIO $ fileUsers (ausFile usersForm)
-  mapM_ (addStudentR classId) res
+  res <- liftIO $ fileUsers (fFile usersForm)
+  case res of
+    Left err     -> setMessage $ "Error enrolling students: " ++ TB.text (fromString err)
+    Right emails -> mapM_ (addStudentR classId) emails
 
-fileUsers :: FileInfo -> IO [AddUserForm]
-fileUsers file = do
-  bytes <- runResourceT $ fileSource file $$ sinkLbs
-  return (map stringUser . lines . LB8.unpack $ bytes)
+fileUsers :: FileInfo -> IO (Either String [AddUserForm])
+fileUsers file = Right . map stringUser <$> fileLines file
+  where
+    stringUser :: String -> AddUserForm
+    stringUser = AddUserForm . fromString . snipSpaces
 
-stringUser :: String -> AddUserForm
-stringUser = AddUserForm . fromString . snipSpaces
 
-snipSpaces :: String -> String
-snipSpaces = reverse . dropWhile isSpace . reverse . dropWhile isSpace
 
 -- | Enroll a single student to the class
 addStudentR :: ClassId -> AddUserForm -> Handler ()

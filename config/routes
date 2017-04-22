@@ -18,7 +18,7 @@
 /class/edit/settings/#ClassId             EditClassR      POST
 /class/edit/instructor/#ClassId           NewInstructorR  POST
 /class/edit/student/#ClassId              NewStudentR     POST          -- enroll single student
-/class/edit/students/#ClassId             NewStudentsR    POST          -- enroll many students by csv 
+/class/edit/students/#ClassId             NewStudentsR    POST          -- enroll many students by csv
 
 /class/del/instructor/#ClassId/#UserId    DelInsR         GET
 /class/del/student/#ClassId/#UserId       DelStdR         GET
@@ -27,4 +27,5 @@
 /assign/view/#ClassId/#AssignmentId       AssignmentR     GET
 /assign/edit/#ClassId/#AssignmentId       EditAssignmentR POST
 
-/score/#ClassId/#AssignmentId             ScoreR POST
+/score/#ClassId/#AssignmentId             ScoreR          POST
+/scores/#ClassId/#AssignmentId            ScoresR         POST

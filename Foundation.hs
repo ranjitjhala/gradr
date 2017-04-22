@@ -173,6 +173,7 @@ instance Yesod App where
     isAuthorized (NewStudentsR _) _   = isAuthenticated
     isAuthorized (NewInstructorR _) _ = isAuthenticated
     isAuthorized (ScoreR _ _) _       = isAuthenticated
+    isAuthorized (ScoresR _ _) _      = isAuthenticated
     isAuthorized (DelInsR _ _) _      = isAuthenticated
     isAuthorized (DelStdR _ _) _      = isAuthenticated
 

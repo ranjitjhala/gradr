@@ -23,11 +23,14 @@ Web application for managing grades
 
 ### Views
 
-- [ ] ASSIGN  Add scores   by CSV     <<<<    HEREHEREHEREHERE
-- [ ] TABS    viewAssignment Edit | View | Update
+- [ ] CLASS   Delete Assignment         <<<<    HEREHEREHEREHERE
+- [ ] ASSIGN  Add scores      by CSV     
 - [ ] CLASS   Export scores   by CSV     
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
-- [ ] CLASS   Delete Assignment
 
 [upload]: http://stackoverflow.com/questions/23377137/how-to-read-contents-of-an-uploaded-file
+
+
+[confirm]:
+http://stackoverflow.com/questions/16849117/html-how-to-do-a-confirmation-popup-to-a-submit-button-and-then-send-the-reque

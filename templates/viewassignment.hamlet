@@ -4,35 +4,54 @@
 
     <p> Taught by #{userIdent instr}
 
-    <h2> #{assignmentName asgn} (#{assignmentPoints asgn} Points)
+    <h3> #{assignmentName asgn} (#{assignmentPoints asgn} Points)
 
     <hr>
 
-    <h2> Edit
-      <div .container>
-        <div .bs-docs-section>
-            <div .col-lg-12>
-                <form .form-horizontal method=post action=@{EditAssignmentR classId assignId} enctype=#{asgEnc}>
-                    ^{asgWidget}
+    <ul .nav.nav-tabs>
+        <li .active><a data-toggle="pill" href="#tab-view">View</a></li>
+        <li><a data-toggle="pill" href="#tab-upload">Upload</a></li>
+        <li><a data-toggle="pill" href="#tab-edit">Edit</a></li>
 
-    <hr>
+    <div .tab-content>
 
-    <table class="table">
-        <thead>
-          <tr>
-            <td><b>Student &nbsp;
-            <td><b>Email   &nbsp;
-            <td><b>Score
+        <div .tab-pane.fade.in.active id="tab-view">
+            <table class="table">
+              <thead>
+                <tr>
+                  <td><b>Student &nbsp;
+                  <td><b>Email   &nbsp;
+                  <td><b>Score
 
-        <tbody>
-        $forall (Entity _ user, pts) <- scores
-          <tr>
-            <td> #{userIdent        user}
-            <td> #{userEmailAddress user}
-            <td> #{pts}
+              <tbody>
+                $forall (Entity _ user, pts) <- scores
+                  <tr>
+                    <td> #{userIdent        user}
+                    <td> #{userEmailAddress user}
+                    <td> #{pts}
 
+        <div .tab-pane.fade id="tab-upload">
 
-    <h2> Update Scores
-        <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{ScoreR classId assignId} enctype=#{stdEnc}>
-              ^{stdWidget}
+             <br>
+
+             <p> Assign scores via .csv file with email, score
+                 <div .bs-callout bs-callout-info well>
+                   <form .form-horizontal method=post action=@{ScoresR classId assignId} enctype=#{scoEnc}>
+                       ^{scoWidget}
+
+             <br>
+
+        <div .tab-pane.fade id="tab-edit">
+             <div .container>
+               <div .bs-docs-section>
+                   <div .col-lg-12>
+                       <br>
+                       <h4> Edit Assignment
+                       <form .form-horizontal method=post action=@{EditAssignmentR classId assignId} enctype=#{asgEnc}>
+                           ^{asgWidget}
+
+                       <br>
+                       <h4> Update Scores
+                           <div .bs-callout bs-callout-info well>
+                             <form .form-horizontal method=post action=@{ScoreR classId assignId} enctype=#{stdEnc}>
+                                 ^{stdWidget}

@@ -119,11 +119,18 @@ updScores us ens = [ (fst u, score u) | u <- us ]
     scorem       = M.fromList [(e, n) | (e, n) <- ens ]
     userKey      = userEmailAddress . entityVal
 
-updAssignmentScores :: AssignmentId -> [(Entity User, Int)] -> Handler ()
-updAssignmentScores assignId scores = do
+updAssignmentScores_ :: AssignmentId -> [(Entity User, Int)] -> Handler ()
+updAssignmentScores_ assignId scores = do
   _ <- runDB $ deleteWhere [ScoreAssignment ==. assignId]
   _ <- runDB $ insertMany [Score uid assignId pts | (Entity uid _, pts) <- scores]
   return ()
+
+updAssignmentScores
+  :: AssignmentId -> [(Entity User, Int)] -> [(Text, Int)] ->  Handler ()
+updAssignmentScores assignId oldScores
+  = updAssignmentScores_ assignId . updScores oldScores
+
+
 
 getScoresByUser :: UserId -> ClassId -> Handler [(Assignment, Int)]
 getScoresByUser userId classId = do
