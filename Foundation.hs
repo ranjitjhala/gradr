@@ -159,12 +159,10 @@ instance Yesod App where
     isAuthorized FaviconR _        = return Authorized
     isAuthorized RobotsR _         = return Authorized
     isAuthorized (StaticR _) _     = return Authorized
-
     isAuthorized ProfileR    _        = isAuthenticated
     isAuthorized EditUserR _          = isAuthenticated
     isAuthorized NewClassR   _        = isAuthenticated
     isAuthorized (EditClassR _) _     = isAuthenticated
-    isAuthorized (EditAssignmentR _ _) _ = isAuthenticated
     isAuthorized (NewAssignR _) _     = isAuthenticated
     isAuthorized (ClassInsR _)  _     = isAuthenticated
     isAuthorized (ClassStdR _)  _     = isAuthenticated
@@ -176,6 +174,8 @@ instance Yesod App where
     isAuthorized (ScoresR _ _) _      = isAuthenticated
     isAuthorized (DelInsR _ _) _      = isAuthenticated
     isAuthorized (DelStdR _ _) _      = isAuthenticated
+    isAuthorized (EditAssignmentR _ _) _ = isAuthenticated
+    isAuthorized (DelAssignmentR _ _) _  = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows

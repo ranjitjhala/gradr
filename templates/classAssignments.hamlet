@@ -1,12 +1,19 @@
 
-    <h2> Assignments
-
     <br>
 
-    <ul>
-      $forall (Entity assignId (Assignment aName aPts _)) <- asgns
-        <li> <a href=@{AssignmentR classId assignId}> #{aName} : #{aPts} points </a>
+      <table class="table">
+          <thead>
+            <tr>
+              <td><b>Name &nbsp;
+              <td><b>Points &nbsp;
+              <td> &nbsp;
 
+          <tbody>
+          $forall (Entity assignId (Assignment aName aPts _)) <- asgns
+            <tr>
+              <td> <a href=@{AssignmentR classId assignId}> #{aName}</a> &nbsp;
+              <td> #{aPts} &nbsp;
+              <td> <a .btn.btn-danger href=@{DelAssignmentR classId assignId}>remove</a>
     <br>
 
     <h3> Add

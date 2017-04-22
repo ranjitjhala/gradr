@@ -5,20 +5,20 @@
     <hr>
 
     <ul .nav.nav-tabs>
-        <li .active><a data-toggle="pill" href="#tab-edit">Edit</a></li>
+        <li><a data-toggle="pill" href="#tab-edit">Edit</a></li>
         <li><a data-toggle="pill" href="#tab-instructors">Instructors</a></li>
-        <li><a data-toggle="pill" href="#tab-assignments">Assignments</a></li>
+        <li .active><a data-toggle="pill" href="#tab-assignments">Assignments</a></li>
         <li><a data-toggle="pill" href="#tab-students">Students</a></li>
 
     <div .tab-content>
 
-        <div .tab-pane.fade.in.active id="tab-edit">
+        <div .tab-pane.fade id="tab-edit">
             ^{classEditWidget classId clsEnc clsWidget}
 
         <div .tab-pane.fade id="tab-instructors">
             ^{classInstructors classId instructor teachers insEnc insWidget}
 
-        <div .tab-pane.fade id="tab-assignments">
+        <div .tab-pane.fade.in.active id="tab-assignments">
             ^{classAssignments classId asgns asgnEnc asgnWidget}
 
         <div .tab-pane.fade id="tab-students">

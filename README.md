@@ -13,6 +13,7 @@ Web application for managing grades
 [hack in isAuthorized]
 
 - [ ] Only an instructor can add assignments
+- [ ] Only an instructor can del assignments
 - [ ] Only an instructor can add teachers
 - [ ] Only an instructor can add students
 - [ ] Only an instructor can view the students in a class
@@ -23,9 +24,9 @@ Web application for managing grades
 
 ### Views
 
-- [ ] CLASS   Delete Assignment         <<<<    HEREHEREHEREHERE
-- [ ] ASSIGN  Add scores      by CSV     
-- [ ] CLASS   Export scores   by CSV     
+- [ ] CLASS   Export scores  by CSV    <<<<    HEREHEREHEREHERE
+- [ ] CLASS   Export class   by CSV   
+- [ ] CLASS   Import class   by CSV   
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
 

@@ -22,6 +22,7 @@
 
 /class/del/instructor/#ClassId/#UserId    DelInsR         GET
 /class/del/student/#ClassId/#UserId       DelStdR         GET
+/class/del/assign/#ClassId/#AssignmentId  DelAssignmentR  GET
 
 /assign/new/#ClassId                      NewAssignR      POST
 /assign/view/#ClassId/#AssignmentId       AssignmentR     GET

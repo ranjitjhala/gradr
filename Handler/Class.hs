@@ -110,6 +110,15 @@ postEditAssignmentR classId asgnId =
     classId
     (AssignmentR classId asgnId)
 
+getDelAssignmentR :: ClassId -> AssignmentId -> Handler Html
+getDelAssignmentR classId asgnId =
+  extendClassHandleR
+    "delete assignment"
+    (return (Just asgnId))
+    (DB.delAssign classId)
+    classId
+    (ClassInsR classId)
+
 --------------------------------------------------------------------------------
 -- | Update Scores for Assignment ----------------------------------------------
 --------------------------------------------------------------------------------

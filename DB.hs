@@ -107,6 +107,12 @@ delTeacher classId userId = runDB $
   deleteWhere [ TeacherClass ==. classId
               , TeacherName  ==. userId ]
 
+delAssign :: ClassId -> AssignmentId -> Handler ()
+delAssign _classId asgnId = do
+  _ <- runDB $ delete asgnId
+  _ <- runDB $ deleteWhere [ ScoreAssignment ==. asgnId ]
+  return ()
+
 delStudent :: ClassId -> UserId -> Handler ()
 delStudent classId userId = runDB $
   deleteWhere [ StudentClass ==. classId
