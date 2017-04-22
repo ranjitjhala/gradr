@@ -24,7 +24,16 @@ Web application for managing grades
 
 ### Views
 
-- [ ] CLASS   Export class by CSV <<<< HEREHERE (see Download)
-- [ ] CLASS   Import class by CSV   
+- [ ] CLASS   Import class by CSV   <<<< HEREHERE
 - [ ] ADMIN   Create Classes
 - [ ] ADMIN   Delete Classes
+
+### Import / Export  CSV format
+
+```csv
+names,hw1,hw2,hw3,hw4
+points,10,20,30,40
+email1,5,15,25,35
+email2,3,13,23,33
+email3,6,16,26,36
+```

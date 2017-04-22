@@ -7,10 +7,11 @@ import qualified Text.Blaze   as TB
 import qualified Auth.Account as Auth
 import           Text.Read (readMaybe)
 import qualified Data.Text.Encoding as T
+import qualified Data.ByteString.Char8 as B
+import qualified Data.HashMap.Strict   as M
 -- import qualified Data.Vector  as V
 -- import qualified Data.Csv     as Csv
 -- import qualified Util as Util
--- import qualified Data.ByteString as S
 -- import qualified Data.ByteString.Lazy as L
 -- import Data.Conduit.Binary
 
@@ -64,12 +65,62 @@ data ClassCsv = ClassCsv
   }
   deriving (Show)
 
+type Scores = [(Assignment, [(Text, Int)])]
+
 classCsv :: ClassId -> Handler ClassCsv
-classCsv = error "TODO:classCsv"
+classCsv classId = scoresCsv <$> classScores classId
+
+classScores :: ClassId -> Handler Scores
+classScores classId = do
+  asgns    <- getAssignmentsByClass classId
+  forM asgns $ \(Entity asgnId asgn) -> do
+    scores <- getRawScores asgnId
+    return (asgn, scores)
+
+scoresCsv :: Scores -> ClassCsv
+scoresCsv sc  = ClassCsv n ns pts (scores sc)
+  where
+    n         = length sc
+    (ns, pts) = unzip [(n, pt) | (Assignment n pt _, _) <- sc]
+
+scores :: Scores -> [(Text, [Int])]
+scores sc   = [(e, eScore e <$> aTables) | e <- emails]
+  where
+    eScore e = M.lookupDefault 0 e
+    aTables  :: [M.HashMap Text Int]
+    aTables  = [M.fromList m | m <- hscores]
+    emails   :: [Text]
+    emails   = M.keys . M.fromList $ concat hscores
+    hscores  :: [[(Text, Int)]]
+    hscores  = snd <$> sc
 
 csvBytes :: ClassCsv -> ByteString
-csvBytes = error "TODO:csvBytes"
+csvBytes c = B.unlines $ namesBS  (csvNames  c)
+                       : pointsBS (csvPoints c)
+                       : (scoresBS <$> csvScores c)
 
+namesBS :: [Text] -> ByteString
+namesBS asgns = commaCat ("names" : (T.encodeUtf8 <$> asgns))
+
+pointsBS :: [Int] -> ByteString
+pointsBS pts = commaCat ("points" : (intBS <$> pts))
+
+scoresBS :: (Text, [Int]) -> ByteString
+scoresBS (u, ns) = commaCat (T.encodeUtf8 u : (intBS <$> ns))
+
+intBS :: Int -> ByteString
+intBS = fromString . show
+
+commaCat :: [ByteString] -> ByteString
+commaCat = intercalate ","
+
+{-
+ names,hw1,hw2,hw3,hw4
+points,10,20,30,40
+email1,5,15,25,35
+email2,3,13,23,33
+email3,6,16,26,36
+-}
 --------------------------------------------------------------------------------
 -- | Viewing Existing Classes --------------------------------------------------
 --------------------------------------------------------------------------------
@@ -250,9 +301,6 @@ scoreForm scores = renderForm (sequenceA (userForm <$> scores) <* submitButton "
                                  <*> areq intField (textString email) (Just score)
       where
         email = userEmailAddress (entityVal user)
-
-textString :: (IsString a) => Text -> a
-textString = fromString . unpack
 
 dummyScores :: [(Text, Int)]
 dummyScores = [ ("Michael", 26)

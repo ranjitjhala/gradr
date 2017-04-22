@@ -12,7 +12,6 @@
         <li .active><a data-toggle="pill" href="#tab-view">View</a></li>
         <li><a data-toggle="pill" href="#tab-upload">Upload</a></li>
         <li><a data-toggle="pill" href="#tab-edit">Edit</a></li>
-        <li><a data-toggle="pill" href="#tab-download">Edit</a></li>
 
     <div .tab-content>
 

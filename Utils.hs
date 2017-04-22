@@ -26,3 +26,6 @@ fileLines :: FileInfo -> IO [String]
 fileLines file = do
   bytes <- runResourceT $ fileSource file $$ sinkLbs
   return (lines . LB8.unpack $ bytes)
+
+textString :: (IsString a) => Text -> a
+textString = fromString . unpack

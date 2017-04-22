@@ -26,5 +26,15 @@
             ^{classStudents classId students stdEnc stdWidget csvEnc csvWidget}
 
         <div .tab-pane.fade.in.active id="tab-export">
+
             <br>
-            <a class="btn btn-default" href=@{ClassExportR classId}>Export Scores to .csv</a>
+
+            <p> Export scores to .csv file.
+
+            <br>
+
+            <a class="btn btn-default" href=@{ClassExportR classId}>Download</a>
+
+            <br>
+
+            <br>
