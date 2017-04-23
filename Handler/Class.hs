@@ -9,6 +9,8 @@ import           Text.Read (readMaybe)
 import qualified Data.Text.Encoding as T
 import qualified Data.ByteString.Char8 as B
 import qualified Data.HashMap.Strict   as M
+import           Handler.Widgets
+
 -- import qualified Data.Vector  as V
 -- import qualified Data.Csv     as Csv
 -- import qualified Util as Util
@@ -553,18 +555,3 @@ classForm = renderForm $ ClassForm
     <$> areq textField "Name" Nothing
     <*> areq textField "Term" Nothing
     <*  submitButton "Submit"
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-classEdit classId clsEnc clsWidget
-  = $(widgetFile "classEdit")
-
-classInstructors classId instructor teachers insEnc insWidget
-  = $(widgetFile "classInstructors")
-
-classAssignments classId asgns asgnEnc asgnWidget
-  = $(widgetFile "classAssignments")
-
-classStudents classId students stdEnc stdWidget stdCsvEnc stdCsvWidget
-  = $(widgetFile "classStudents")

@@ -2,5 +2,6 @@
       <div .container>
         <div .bs-docs-section>
             <div .col-lg-12>
+                <br>
                 <form .form-horizontal method=post action=@{EditClassR classId} enctype=#{clsEnc}>
                     ^{clsWidget}

@@ -27,23 +27,7 @@
             ^{classStudents classId students stdEnc stdWidget csvEnc csvWidget}
 
         <div .tab-pane.fade.in.active id="tab-import">
-            <br>
-
-            <p> Import scores from .csv file containing
-                <ul>
-                  <li> enrolled students and
-                  <li> existing assignments.
-
-            <p> <a href="https://github.com/ranjitjhala/gradr#import--export--csv-format">Click here</a> for format.
-
-                <div .bs-callout bs-callout-info well>
-                   <form .form-horizontal method=post action=@{ClassImportR classId} enctype=#{scoEnc}>
-                       ^{scoWidget}
+            ^{classImport classId scoEnc scoWidget}
 
         <div .tab-pane.fade id="tab-export">
-            <br>
-            <p> Export scores to .csv file.
-            <br>
-            <a class="btn btn-default" href=@{ClassExportR classId}>Download</a>
-            <br>
-            <br>
+            ^{classExport classId}
