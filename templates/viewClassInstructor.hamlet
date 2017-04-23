@@ -5,11 +5,12 @@
     <hr>
 
     <ul .nav.nav-tabs>
-        <li><a data-toggle="pill"        href="#tab-edit">Edit</a></li>
+        <li><a data-toggle="pill" href="#tab-edit">Edit</a></li>
         <li><a data-toggle="pill" href="#tab-instructors">Instructors</a></li>
         <li><a data-toggle="pill" href="#tab-assignments">Assignments</a></li>
-        <li><a data-toggle="pill"    href="#tab-students">Students</a></li>
-        <li .active><a data-toggle="pill" href="#tab-export">Export</a></li>
+        <li><a data-toggle="pill" href="#tab-students">Students</a></li>
+        <li .active><a data-toggle="pill" href="#tab-import">Import</a></li>
+        <li><a data-toggle="pill" href="#tab-export">Export</a></li>
 
     <div .tab-content>
 
@@ -25,16 +26,24 @@
         <div .tab-pane.fade id="tab-students">
             ^{classStudents classId students stdEnc stdWidget csvEnc csvWidget}
 
-        <div .tab-pane.fade.in.active id="tab-export">
-
+        <div .tab-pane.fade.in.active id="tab-import">
             <br>
 
+            <p> Import scores from .csv file containing
+                <ul>
+                  <li> enrolled students and
+                  <li> existing assignments.
+
+            <p> <a href="">Click here</a> for format.
+
+                <div .bs-callout bs-callout-info well>
+                   <form .form-horizontal method=post action=@{ClassImportR classId} enctype=#{scoEnc}>
+                       ^{scoWidget}
+
+        <div .tab-pane.fade id="tab-export">
+            <br>
             <p> Export scores to .csv file.
-
             <br>
-
             <a class="btn btn-default" href=@{ClassExportR classId}>Download</a>
-
             <br>
-
             <br>

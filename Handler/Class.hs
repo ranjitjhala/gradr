@@ -78,21 +78,25 @@ classScores classId = do
     return (asgn, scores)
 
 scoresCsv :: Scores -> ClassCsv
-scoresCsv sc  = ClassCsv n ns pts (scores sc)
+scoresCsv sc  = ClassCsv n ns pts (studentScores sc)
   where
     n         = length sc
     (ns, pts) = unzip [(n, pt) | (Assignment n pt _, _) <- sc]
 
-scores :: Scores -> [(Text, [Int])]
-scores sc   = [(e, eScore e <$> aTables) | e <- emails]
+studentScores    :: Scores -> [(Text, [Int])]
+studentScores sc = [(e, eScore e <$> aTables) | e <- emails]
   where
-    eScore e = M.lookupDefault 0 e
-    aTables  :: [M.HashMap Text Int]
-    aTables  = [M.fromList m | m <- hscores]
-    emails   :: [Text]
-    emails   = M.keys . M.fromList $ concat hscores
-    hscores  :: [[(Text, Int)]]
-    hscores  = snd <$> sc
+    eScore e     = M.lookupDefault 0 e
+    aTables      :: [M.HashMap Text Int]
+    aTables      = [M.fromList m | m <- hscores]
+    emails       :: [Text]
+    emails       = M.keys . M.fromList $ concat hscores
+    hscores      :: [[(Text, Int)]]
+    hscores      = snd <$> sc
+
+scoresStudent :: [Assignment] -> [(Text, [Int])] -> Scores
+scoresStudent = error "TBD:scoresStudent"
+
 
 csvBytes :: ClassCsv -> ByteString
 csvBytes c = B.unlines $ namesBS  (csvNames  c)
@@ -114,13 +118,7 @@ intBS = fromString . show
 commaCat :: [ByteString] -> ByteString
 commaCat = intercalate ","
 
-{-
- names,hw1,hw2,hw3,hw4
-points,10,20,30,40
-email1,5,15,25,35
-email2,3,13,23,33
-email3,6,16,26,36
--}
+
 --------------------------------------------------------------------------------
 -- | Viewing Existing Classes --------------------------------------------------
 --------------------------------------------------------------------------------
@@ -133,9 +131,10 @@ getClassInsR classId = do
   teachers              <- getInstructorsByClass classId
   (asgnWidget, asgnEnc) <- generateFormPost assignForm
   (stdWidget,  stdEnc)  <- generateFormPost addUserForm
-  (csvWidget,  csvEnc)  <- generateFormPost fileForm
+  (csvWidget,  csvEnc)  <- generateFormPost fileForm      -- upload students
   (insWidget,  insEnc)  <- generateFormPost addUserForm
   (clsWidget,  clsEnc)  <- generateFormPost classForm
+  (scoWidget,  scoEnc)  <- generateFormPost fileForm      -- upload scores
   defaultLayout $
     $(widgetFile "viewClassInstructor")
 
@@ -206,24 +205,31 @@ postScoreR classId assignId = do
     classId
     (AssignmentR classId assignId)
 
-postScoresR :: ClassId -> AssignmentId -> Handler Html
-postScoresR classId assignId = do
-  oldScores <- getAssignmentScores classId assignId
-  extendClassFormR
-    "update scores by .csv"
-    fileForm
-    (addScoresR classId assignId oldScores)
-    classId
-    (AssignmentR classId assignId)
 
+--------------------------------------------------------------------------------
+-- | Update Scores by CSV ------------------------------------------------------
+--------------------------------------------------------------------------------
+postClassImportR :: ClassId -> Handler Html
+postClassImportR classId = error "TBD"
+  -- extendClassFormR
+    -- "update scores by .csv"
+    -- fileForm
+    -- (addScoresR classId assignId)
+    -- classId
+    -- (AssignmentR classId assignId)
 
 -- | Add multiple scores via CSV upload
-addScoresR :: ClassId -> AssignmentId -> [(Entity User, Int)] -> FileForm -> Handler ()
-addScoresR classId assignId oldScores scoresForm = do
-  res <- liftIO $ fileScores (fFile scoresForm)
+addScoresR :: ClassId -> AssignmentId -> FileForm -> Handler ()
+addScoresR classId assignId scoresForm = do
+  res       <- liftIO $ fileScores (fFile scoresForm)
   case res of
     Left err     -> setMessage $ "Error updating scores: " ++ TB.text (fromString err)
-    Right scores -> updAssignmentScores assignId oldScores scores
+    Right scores -> addScoresR' classId assignId scores
+
+addScoresR' :: ClassId -> AssignmentId -> [(Text, Int)] -> Handler ()
+addScoresR' classId assignId scores = do
+  oldScores <- getAssignmentScores classId assignId
+  updAssignmentScores assignId oldScores scores
 
 fileScores :: FileInfo -> IO (Either String [(Text, Int)])
 fileScores file = sequenceA . map stringScore <$> fileLines file
@@ -337,7 +343,7 @@ data FileForm = FileForm
 
 fileForm :: Form FileForm
 fileForm = renderForm $ FileForm
-  <$> areq fileField ".csv file" Nothing
+  <$> areq fileField "" Nothing
   <*  submitButton   "Upload"
 
 postNewStudentsR :: ClassId -> Handler Html

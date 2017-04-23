@@ -29,6 +29,5 @@
 /assign/edit/#ClassId/#AssignmentId       EditAssignmentR POST
 
 /score/#ClassId/#AssignmentId             ScoreR          POST
-/scores/#ClassId/#AssignmentId            ScoresR         POST
-
+/class/import/#ClassId                    ClassImportR    POST          -- import a .csv of scores
 /class/export/#ClassId                    ClassExportR    GET           -- export a .csv of all students' scores

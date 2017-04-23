@@ -30,17 +30,6 @@
                     <td> #{userEmailAddress user}
                     <td> #{pts}
 
-        <div .tab-pane.fade id="tab-upload">
-
-             <br>
-
-             <p> Assign scores via .csv file with email, score
-                 <div .bs-callout bs-callout-info well>
-                   <form .form-horizontal method=post action=@{ScoresR classId assignId} enctype=#{scoEnc}>
-                       ^{scoWidget}
-
-             <br>
-
         <div .tab-pane.fade id="tab-edit">
              <div .container>
                <div .bs-docs-section>

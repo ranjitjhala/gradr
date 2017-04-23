@@ -1,8 +1,6 @@
 
-    <h2> Edit
       <div .container>
         <div .bs-docs-section>
             <div .col-lg-12>
                 <form .form-horizontal method=post action=@{EditClassR classId} enctype=#{clsEnc}>
                     ^{clsWidget}
-
