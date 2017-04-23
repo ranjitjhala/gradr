@@ -34,7 +34,7 @@
                   <li> enrolled students and
                   <li> existing assignments.
 
-            <p> <a href="">Click here</a> for format.
+            <p> <a href="https://github.com/ranjitjhala/gradr#import--export--csv-format">Click here</a> for format.
 
                 <div .bs-callout bs-callout-info well>
                    <form .form-horizontal method=post action=@{ClassImportR classId} enctype=#{scoEnc}>

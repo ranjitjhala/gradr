@@ -30,7 +30,7 @@ Web application for managing grades
 
 ### Import / Export  CSV format
 
-```csv
+```.csv
 names,hw1,hw2,hw3,hw4
 points,10,20,30,40
 email1,5,15,25,35

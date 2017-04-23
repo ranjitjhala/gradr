@@ -1,9 +1,12 @@
 module Utils where
 
-import           Import
+import           Import       hiding (group)
 import           Data.Char           (isSpace)
 import           Data.Conduit.Binary (sinkLbs)
 import qualified Data.ByteString.Lazy.Char8 as LB8
+import qualified Data.HashMap.Strict        as M
+import qualified Data.List                  as L
+-- import           Data.Hashable
 
 stringFields :: Int -> String -> Either String [String]
 stringFields n s
@@ -29,3 +32,18 @@ fileLines file = do
 
 textString :: (IsString a) => Text -> a
 textString = fromString . unpack
+
+group :: (Eq k, Hashable k) => [(k, v)] -> M.HashMap k [v]
+group = groupBase M.empty
+
+groupBase :: (Eq k, Hashable k) => M.HashMap k [v] -> [(k, v)] -> M.HashMap k [v]
+groupBase = L.foldl' (\m (k, v) -> inserts k v m)
+
+groupList :: (Eq k, Hashable k) => [(k, v)] -> [(k, [v])]
+groupList = M.toList . group
+
+groupMap   :: (Eq k, Hashable k) => (a -> k) -> [a] -> M.HashMap k [a]
+groupMap f = L.foldl' (\m x -> inserts (f x) x m) M.empty
+
+inserts ::  (Eq k, Hashable k) => k -> v -> M.HashMap k [v] -> M.HashMap k [v]
+inserts k v m = M.insert k (v : M.lookupDefault [] k m) m

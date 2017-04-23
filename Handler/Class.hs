@@ -19,6 +19,8 @@ import qualified Data.HashMap.Strict   as M
 -- import qualified Yesod.Form.Bootstrap3 as BS3 -- (BootstrapSubmit, BootstrapFormLayout (..), renderBootstrap3)
 -- import Yesod.Form.Jquery (jqueryAutocompleteField)
 
+scoresStudent :: [AssignmentId] -> [(Text, [Int])] -> Scores
+
 --------------------------------------------------------------------------------
 -- | Viewing/Changing User Settings --------------------------------------------
 --------------------------------------------------------------------------------
@@ -49,8 +51,64 @@ settingsForm u = renderForm $ SettingsForm
   <*  submitButton "Update"
 
 --------------------------------------------------------------------------------
+-- | Import Class Scores by .csv -----------------------------------------------
+--------------------------------------------------------------------------------
+postClassImportR :: ClassId -> Handler Html
+postClassImportR classId =
+  extendClassFormR
+    "updating scores by .csv"
+    fileForm
+    (addScoresR classId)
+    classId
+    (ClassInsR classId)
+
+-- | Add multiple scores via CSV upload
+addScores1R :: ClassId -> AssignmentId -> FileForm -> Handler ()
+addScores1R classId assignId scoresForm = do
+  res            <- liftIO $ fileAsgnScores (fFile scoresForm)
+  case res of
+    Left err     -> setMessage $ "Error updating scores: " ++ TB.text (fromString err)
+    Right scores -> addScoresR' classId assignId scores
+
+-- | Add scores for multiple assignments via CSV upload
+addScoresR :: ClassId -> FileForm -> Handler ()
+addScoresR classId scoresForm = do
+  res          <- fileScores (fFile scoresForm)
+  case res of
+    Left err   -> setMessage $ "Error updating scores: " ++ TB.text (fromString err)
+    Right aScs -> forM_ aScs (uncurry (addScoresR' classId))
+
+addScoresR' :: ClassId -> AssignmentId -> [(Text, Int)] -> Handler ()
+addScoresR' classId assignId scores = do
+  oldScores <- getAssignmentScores classId assignId
+  updAssignmentScores assignId oldScores scores
+
+-- HEREHEREHEREHEREHERE
+fileScores
+  :: FileInfo
+  -> Handler (Either String [(AssignmentId, [(Text, Int)])])
+fileScores = error "TBD:fileScores"
+
+{-@ scoresStudent :: aIds:[AssignmentId] -> [(Text, ListX Int aIds)] -> Scores @-}
+scoresStudent aIds xns =
+  groupList [ (aId, (x, n)) | (x, ns)  <- xScores
+                            , (n, aId) <- zip ns aIds]
+
+
+fileAsgnScores :: FileInfo -> IO (Either String [(Text, Int)])
+fileAsgnScores file = sequenceA . map stringScore <$> fileLines file
+
+stringScore :: String -> Either String (Text, Int)
+stringScore s = case stringFields 2 s of
+                  Left err       -> Left err
+                  Right [em, s2] -> case readMaybe s2 of
+                                      Nothing -> Left ("Malformed score: " ++ s)
+                                      Just n  -> Right (fromString em, n)
+
+--------------------------------------------------------------------------------
 -- | Export Class Scores to .csv -----------------------------------------------
 --------------------------------------------------------------------------------
+
 getClassExportR :: ClassId -> Handler TypedContent
 getClassExportR classId = do
   bytes <- csvBytes <$> classCsv classId
@@ -65,7 +123,7 @@ data ClassCsv = ClassCsv
   }
   deriving (Show)
 
-type Scores = [(Assignment, [(Text, Int)])]
+type Scores = [(AssignmentId, [(Text, Int)])]
 
 classCsv :: ClassId -> Handler ClassCsv
 classCsv classId = scoresCsv <$> classScores classId
@@ -93,9 +151,6 @@ studentScores sc = [(e, eScore e <$> aTables) | e <- emails]
     emails       = M.keys . M.fromList $ concat hscores
     hscores      :: [[(Text, Int)]]
     hscores      = snd <$> sc
-
-scoresStudent :: [Assignment] -> [(Text, [Int])] -> Scores
-scoresStudent = error "TBD:scoresStudent"
 
 
 csvBytes :: ClassCsv -> ByteString
@@ -206,40 +261,7 @@ postScoreR classId assignId = do
     (AssignmentR classId assignId)
 
 
---------------------------------------------------------------------------------
--- | Update Scores by CSV ------------------------------------------------------
---------------------------------------------------------------------------------
-postClassImportR :: ClassId -> Handler Html
-postClassImportR classId = error "TBD"
-  -- extendClassFormR
-    -- "update scores by .csv"
-    -- fileForm
-    -- (addScoresR classId assignId)
-    -- classId
-    -- (AssignmentR classId assignId)
 
--- | Add multiple scores via CSV upload
-addScoresR :: ClassId -> AssignmentId -> FileForm -> Handler ()
-addScoresR classId assignId scoresForm = do
-  res       <- liftIO $ fileScores (fFile scoresForm)
-  case res of
-    Left err     -> setMessage $ "Error updating scores: " ++ TB.text (fromString err)
-    Right scores -> addScoresR' classId assignId scores
-
-addScoresR' :: ClassId -> AssignmentId -> [(Text, Int)] -> Handler ()
-addScoresR' classId assignId scores = do
-  oldScores <- getAssignmentScores classId assignId
-  updAssignmentScores assignId oldScores scores
-
-fileScores :: FileInfo -> IO (Either String [(Text, Int)])
-fileScores file = sequenceA . map stringScore <$> fileLines file
-
-stringScore :: String -> Either String (Text, Int)
-stringScore s = case stringFields 2 s of
-                  Left err       -> Left err
-                  Right [em, s2] -> case readMaybe s2 of
-                                      Nothing -> Left ("Malformed score: " ++ s)
-                                      Just n  -> Right (fromString em, n)
 --------------------------------------------------------------------------------
 -- | Deleting Instructors/Students from a Class --------------------------------
 --------------------------------------------------------------------------------
