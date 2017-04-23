@@ -5,17 +5,18 @@
     <hr>
 
     <ul .nav.nav-tabs>
-        <li><a data-toggle="pill" href="#tab-edit">Edit</a></li>
+        <li .active><a data-toggle="pill" href="#tab-scores">Scores</a></li>
         <li><a data-toggle="pill" href="#tab-instructors">Instructors</a></li>
         <li><a data-toggle="pill" href="#tab-assignments">Assignments</a></li>
         <li><a data-toggle="pill" href="#tab-students">Students</a></li>
-        <li .active><a data-toggle="pill" href="#tab-import">Import</a></li>
+        <li><a data-toggle="pill" href="#tab-import">Import</a></li>
         <li><a data-toggle="pill" href="#tab-export">Export</a></li>
+        <li><a data-toggle="pill" href="#tab-edit">Edit</a></li>
 
     <div .tab-content>
 
-        <div .tab-pane.fade id="tab-edit">
-            ^{classEdit classId clsEnc clsWidget}
+        <div .tab-pane.fade.in.active id="tab-scores">
+            ^{classScores csv}
 
         <div .tab-pane.fade id="tab-instructors">
             ^{classInstructors classId instructor teachers insEnc insWidget}
@@ -26,8 +27,11 @@
         <div .tab-pane.fade id="tab-students">
             ^{classStudents classId students stdEnc stdWidget csvEnc csvWidget}
 
-        <div .tab-pane.fade.in.active id="tab-import">
+        <div .tab-pane.fade id="tab-import">
             ^{classImport classId scoEnc scoWidget}
 
         <div .tab-pane.fade id="tab-export">
             ^{classExport classId}
+
+        <div .tab-pane.fade id="tab-edit">
+            ^{classEdit classId clsEnc clsWidget}

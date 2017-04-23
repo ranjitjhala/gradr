@@ -1,6 +1,7 @@
 module Handler.Widgets where
 
 import           Import
+import           Handler.Common
 
 classEdit classId clsEnc clsWidget
   = $(widgetFile "classEdit")
@@ -19,3 +20,6 @@ classExport classId
 
 classImport classId scoEnc scoWidget
   = $(widgetFile "classImport")
+
+classScores csv
+  = $(widgetFile "classScores")

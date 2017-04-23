@@ -3,12 +3,11 @@ module Handler.Class where
 import           Import
 import           DB
 import           Utils
-import qualified Text.Blaze   as TB
-import qualified Auth.Account as Auth
-import           Text.Read (readMaybe)
+import qualified Text.Blaze         as TB
+import qualified Auth.Account       as Auth
 import qualified Data.Text.Encoding as T
-import qualified Data.ByteString.Char8 as B
-import qualified Data.HashMap.Strict   as M
+import           Text.Read (readMaybe)
+import           Handler.Common
 import           Handler.Widgets
 
 -- import qualified Data.Vector  as V
@@ -176,63 +175,15 @@ getClassExportR classId = do
   addHeader "Content-Disposition" "attachment; filename=\"scores.csv\""
   sendResponse (T.encodeUtf8 "text/csv", toContent bytes)
 
-data ClassCsv = ClassCsv
-  { csvAsgns  :: Int
-  , csvNames  :: [Text]           -- List Text csvAsgns
-  , csvPoints :: [Int]            -- List Int  csvAsgns
-  , csvScores :: [(Text, [Int])]  -- [(Text, List Int csvAsgns)]
-  }
-  deriving (Show)
-
-type Scores = [(Entity Assignment, [(Text, Int)])]
-
 classCsv :: ClassId -> Handler ClassCsv
-classCsv classId = scoresCsv <$> classScores classId
+classCsv classId = scoresCsv <$> classIdScores classId
 
-classScores :: ClassId -> Handler Scores
-classScores classId = do
+classIdScores :: ClassId -> Handler Scores
+classIdScores classId = do
   asgns    <- getAssignmentsByClass classId
   forM asgns $ \a -> do
     scores <- getRawScores (entityKey a)
     return (a, scores)
-
-scoresCsv :: Scores -> ClassCsv
-scoresCsv sc  = ClassCsv (length sc) ns pts (studentScores sc)
-  where
-    (ns, pts) = unzip [(n, pt) | (Entity _ (Assignment n pt _), _) <- sc]
-
-studentScores    :: Scores -> [(Text, [Int])]
-studentScores sc = [(e, eScore e <$> aTables) | e <- emails]
-  where
-    eScore e     = M.lookupDefault 0 e
-    aTables      :: [M.HashMap Text Int]
-    aTables      = [M.fromList m | m <- hscores]
-    emails       :: [Text]
-    emails       = M.keys . M.fromList $ concat hscores
-    hscores      :: [[(Text, Int)]]
-    hscores      = snd <$> sc
-
-
-csvBytes :: ClassCsv -> ByteString
-csvBytes c = B.unlines $ namesBS  (csvNames  c)
-                       : pointsBS (csvPoints c)
-                       : (scoresBS <$> csvScores c)
-
-namesBS :: [Text] -> ByteString
-namesBS asgns = commaCat ("names" : (T.encodeUtf8 <$> asgns))
-
-pointsBS :: [Int] -> ByteString
-pointsBS pts = commaCat ("points" : (intBS <$> pts))
-
-scoresBS :: (Text, [Int]) -> ByteString
-scoresBS (u, ns) = commaCat (T.encodeUtf8 u : (intBS <$> ns))
-
-intBS :: Int -> ByteString
-intBS = fromString . show
-
-commaCat :: [ByteString] -> ByteString
-commaCat = intercalate ","
-
 
 --------------------------------------------------------------------------------
 -- | Viewing Existing Classes --------------------------------------------------
@@ -244,6 +195,7 @@ getClassInsR classId = do
   asgns                 <- getAssignmentsByClass classId
   students              <- getStudentsByClass    classId
   teachers              <- getInstructorsByClass classId
+  csv                   <- classCsv classId
   (asgnWidget, asgnEnc) <- generateFormPost assignForm
   (stdWidget,  stdEnc)  <- generateFormPost addUserForm
   (csvWidget,  csvEnc)  <- generateFormPost fileForm      -- upload students

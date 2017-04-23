@@ -27,9 +27,9 @@ Web application for managing grades
 
 ### Views
 
-- [ ] INSTR   Delete Class    <<<< HEREHEREHERE
-- [ ] INSTR   View   Scores   
-- [ ] STUDENT View   Scores
+- [ ] INSTR   View   Scores   <<<< HEREHEREHERE
+- [ ] STUDENT View   Scores   
+- [ ] INSTR   Delete Class    
 
 ### Import / Export  CSV format
 

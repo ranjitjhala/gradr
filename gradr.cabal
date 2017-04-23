@@ -24,6 +24,7 @@ library
                      Handler.Home
                      Handler.Comment
                      Handler.Profile
+                     Handler.Widgets
                      Handler.Class
                      Auth.Account
                      Utils

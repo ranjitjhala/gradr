@@ -1,0 +1,16 @@
+
+      <br>
+
+      <table class="table">
+          <thead>
+            <tr>
+              <td> <b> Student
+              $forall (aName, aPts) <- zip (csvNames csv) (csvPoints csv)
+                <td> <b> #{aName} (#{aPts})
+
+          <tbody>
+          $forall (student, scores) <- csvScores csv
+            <tr>
+              <td> #{student}
+              $forall score <- scores
+                <td> #{score}
