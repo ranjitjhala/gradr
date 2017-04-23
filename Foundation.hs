@@ -220,6 +220,7 @@ instance YesodBreadcrumbs App where
   breadcrumb (AuthR _)         = return ("Login"     , Just HomeR)
   breadcrumb ProfileR          = return ("Profile"   , Just HomeR)
   breadcrumb (ClassInsR _)     = return ("Class"     , Just ProfileR)
+  breadcrumb (ClassStdR _)     = return ("Class"     , Just ProfileR)
   breadcrumb (AssignmentR c _) = return ("Assignment", Just (ClassInsR c))
   breadcrumb  _                = return ("home"      , Nothing)
 

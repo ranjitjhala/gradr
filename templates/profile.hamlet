@@ -2,9 +2,9 @@
     <div .bs-docs-section>
         <div .col-lg-12>
 
-           <p> Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
+           <h2><span class="username">#{userIdent user}
 
-           <p> However, we do know that your email is <strong>#{userEmailAddress user}</strong>!
+           <p>#{userEmailAddress user}
 
            <hr>
 
@@ -13,7 +13,7 @@
            $if not $ null insClasses
 
              <h2> Teaching
-
+             <br>
              <ul>
                $forall (Entity classId (Class name term _)) <- insClasses
                  <li> <a href=@{ClassInsR classId}> #{name}, #{term} </a>
@@ -22,8 +22,8 @@
 
            $if not $ null stdClasses
 
-             <h2> Taking
-
+             <h2> Classes
+             <br>
              <ul>
                $forall (Entity classId (Class name term _)) <- stdClasses
                  <li> <a href=@{ClassStdR classId}> #{name}, #{term} </a>

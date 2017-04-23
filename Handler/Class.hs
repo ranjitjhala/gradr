@@ -210,7 +210,8 @@ getClassStdR :: ClassId -> Handler Html
 getClassStdR classId = do
   (userId, _) <- requireAuthPair
   klass       <- getClassById classId
-  scores      <- getScoresByUser userId classId
+  scores      <- classIdScores classId -- SECURITY ERROR
+  stats       <- mkStats scores <$> getScoresByUser userId classId
   defaultLayout $
     $(widgetFile "viewClassStudent")
 

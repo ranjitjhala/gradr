@@ -2,25 +2,21 @@
 
     <h1> #{className klass} : #{classTerm klass}
 
-    <hr>
-
-    <!------------------------------------------------------------------------->
-
-    <h2> Assignments
-
     <br>
 
-    <ul>
-      <table>
+    <table class="table">
+      <thead>
         <tr>
-          <td><b>Assignment
-          <td><b>Score
-          <td><b>Max
-
-        $forall (asgn, score) <- scores
-          <tr>
-            <td>#{assignmentName   asgn}
-            <td>#{score}
-            <td>#{assignmentPoints asgn}
-
-    <!------------------------------------------------------------------------->
+              <td> <b> Assignment
+              <td> <b> Points
+              <td> <b> Percentile
+              <td> <b> Mean
+              <td> <b> Median
+      <tbody>
+        $forall (Stat name max pts pct avg median) <- stats
+            <tr>
+              <td> #{name} (#{max} pts)
+              <td> #{pts}
+              <td> #{pct}
+              <td> #{avg}
+              <td> #{median}

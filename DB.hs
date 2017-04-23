@@ -154,8 +154,6 @@ updAssignmentScores
 updAssignmentScores assignId oldScores
   = updAssignmentScores_ assignId . updScores oldScores
 
-
-
 getScoresByUser :: UserId -> ClassId -> Handler [(Assignment, Int)]
 getScoresByUser userId classId = do
   asgns <- getAssignmentsByClass classId

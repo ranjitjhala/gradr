@@ -30,6 +30,10 @@ Web application for managing grades
 - [ ] STUDENT View   Scores   <<<< HEREHEREHERE
 - [ ] INSTR   Delete Class    
 
+### Student View
+
+
+
 ### Import / Export  CSV format
 
 ```.csv
