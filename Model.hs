@@ -13,7 +13,8 @@ import Yesod.Auth.Account
 share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")
 
-
+instance Hashable AssignmentId where
+  hashWithSalt i = hashWithSalt i . show
 
 instance PersistUserCredentials User where
   userUsernameF       = UserEmailAddress

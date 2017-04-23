@@ -10,11 +10,14 @@ import qualified Data.List                  as L
 
 stringFields :: Int -> String -> Either String [String]
 stringFields n s
-  | length xs == n = Right (snipSpaces <$> xs)
+  | length xs == n = Right xs
   | otherwise      = Left err
   where
-    xs             = splitOn ',' s
+    xs             = stringFields' s
     err            = s ++ " does not have " ++ show n ++ " fields!"
+
+stringFields' :: String -> [String]
+stringFields' s = snipSpaces <$> (splitOn ',' s)
 
 splitOn :: (Eq a) => a -> [a] -> [[a]]
 splitOn _ []     = [[]]
@@ -42,8 +45,8 @@ groupBase = L.foldl' (\m (k, v) -> inserts k v m)
 groupList :: (Eq k, Hashable k) => [(k, v)] -> [(k, [v])]
 groupList = M.toList . group
 
-groupMap   :: (Eq k, Hashable k) => (a -> k) -> [a] -> M.HashMap k [a]
-groupMap f = L.foldl' (\m x -> inserts (f x) x m) M.empty
+groupBy   :: (Eq k, Hashable k) => (a -> k) -> [a] -> M.HashMap k [a]
+groupBy f = L.foldl' (\m x -> inserts (f x) x m) M.empty
 
 inserts ::  (Eq k, Hashable k) => k -> v -> M.HashMap k [v] -> M.HashMap k [v]
 inserts k v m = M.insert k (v : M.lookupDefault [] k m) m

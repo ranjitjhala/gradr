@@ -47,7 +47,7 @@ getUserByEmail :: Text -> Handler (Maybe (Entity User))
 getUserByEmail email =
   runDB $ selectFirst [UserEmailAddress ==. email] []
 
-getAssignmentsByClass :: Key Class -> Handler [Entity Assignment]
+getAssignmentsByClass :: ClassId -> Handler [Entity Assignment]
 getAssignmentsByClass classId =
   runDB $ selectList [AssignmentClass ==. classId] []
 

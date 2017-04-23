@@ -19,7 +19,8 @@ import qualified Data.HashMap.Strict   as M
 -- import qualified Yesod.Form.Bootstrap3 as BS3 -- (BootstrapSubmit, BootstrapFormLayout (..), renderBootstrap3)
 -- import Yesod.Form.Jquery (jqueryAutocompleteField)
 
-scoresStudent :: [AssignmentId] -> [(Text, [Int])] -> Scores
+scoresStudent :: (Eq k, Hashable k) => [k] -> [(Text, [b])] -> [(k, [(Text, b)])]
+stringScores  :: Int -> String -> Either String (Text, [Int])
 
 --------------------------------------------------------------------------------
 -- | Viewing/Changing User Settings --------------------------------------------
@@ -73,7 +74,7 @@ addScores1R classId assignId scoresForm = do
 -- | Add scores for multiple assignments via CSV upload
 addScoresR :: ClassId -> FileForm -> Handler ()
 addScoresR classId scoresForm = do
-  res          <- fileScores (fFile scoresForm)
+  res          <- fileScores classId (fFile scoresForm)
   case res of
     Left err   -> setMessage $ "Error updating scores: " ++ TB.text (fromString err)
     Right aScs -> forM_ aScs (uncurry (addScoresR' classId))
@@ -83,17 +84,41 @@ addScoresR' classId assignId scores = do
   oldScores <- getAssignmentScores classId assignId
   updAssignmentScores assignId oldScores scores
 
+-- YUCK
+fileScores :: ClassId -> FileInfo
+           -> Handler (Either String [(AssignmentId, [(Text, Int)])])
+fileScores classId file = do
+  ls <- liftIO $ fileLines file
+  case ls of
+    []       -> return (Left "Empty .csv file!")
+    [_,_]    -> return (Left "Empty .csv file!")
+    (l:_:ls) -> case fromString <$> stringFields' l of
+                  []     -> return (Left "No assignments in .csv file!")
+                  (_:as) -> do aIds'   <- fileAsgns classId as
+                               case aIds' of
+                                 Left e -> return (Left e)
+                                 Right aIds -> case sequenceA (stringScores (length aIds) <$> ls) of
+                                                 Left e  -> return (Left e)
+                                                 Right z -> return (Right $ scoresStudent aIds z)
+
+fileAsgns :: ClassId -> [Text] -> Handler (Either String [AssignmentId])
+fileAsgns classId as = do
+  asgns <- getAssignmentsByClass classId
+  return $ sequenceA (getAsgnId asgns <$> as)
+
 -- HEREHEREHEREHEREHERE
-fileScores
-  :: FileInfo
-  -> Handler (Either String [(AssignmentId, [(Text, Int)])])
-fileScores = error "TBD:fileScores"
+getAsgnId :: [Entity Assignment] -> Text -> Either String AssignmentId
+getAsgnId asgns a = case find f asgns of
+                      Nothing   -> Left ("Unknown assignment" ++ show a)
+                      Just asgn -> Right (entityKey asgn)
+  where
+    f             = (a ==) . assignmentName . entityVal
 
-{-@ scoresStudent :: aIds:[AssignmentId] -> [(Text, ListX Int aIds)] -> Scores @-}
-scoresStudent aIds xns =
-  groupList [ (aId, (x, n)) | (x, ns)  <- xScores
-                            , (n, aId) <- zip ns aIds]
-
+{-@ scoresStudent :: (Eq k, Hashable k)
+                  => aIds:[k] -> [(Text, ListX b aIds)] -> [(k, [(Text, b)])]
+  @-}
+scoresStudent as xnss = groupList [ (a, (x, n)) | (x, ns) <- xnss
+                                                , (a, n)  <- zip as ns ]
 
 fileAsgnScores :: FileInfo -> IO (Either String [(Text, Int)])
 fileAsgnScores file = sequenceA . map stringScore <$> fileLines file
@@ -104,6 +129,13 @@ stringScore s = case stringFields 2 s of
                   Right [em, s2] -> case readMaybe s2 of
                                       Nothing -> Left ("Malformed score: " ++ s)
                                       Just n  -> Right (fromString em, n)
+
+{-@ stringScores :: n:Nat -> String -> Either String (Text, ListN Int n) @-}
+stringScores n s = case stringFields (n + 1) s of
+                     Left err      -> Left err
+                     Right (em:ss) -> case sequence (readMaybe <$> ss) of
+                                        Nothing -> Left ("Malformed score: " ++ s)
+                                        Just ns -> Right (fromString em, ns)
 
 --------------------------------------------------------------------------------
 -- | Export Class Scores to .csv -----------------------------------------------
@@ -123,7 +155,7 @@ data ClassCsv = ClassCsv
   }
   deriving (Show)
 
-type Scores = [(AssignmentId, [(Text, Int)])]
+type Scores = [(Entity Assignment, [(Text, Int)])]
 
 classCsv :: ClassId -> Handler ClassCsv
 classCsv classId = scoresCsv <$> classScores classId
@@ -131,15 +163,15 @@ classCsv classId = scoresCsv <$> classScores classId
 classScores :: ClassId -> Handler Scores
 classScores classId = do
   asgns    <- getAssignmentsByClass classId
-  forM asgns $ \(Entity asgnId asgn) -> do
-    scores <- getRawScores asgnId
-    return (asgn, scores)
+  forM asgns $ \a -> do
+    scores <- getRawScores (entityKey a)
+    return (a, scores)
 
 scoresCsv :: Scores -> ClassCsv
 scoresCsv sc  = ClassCsv n ns pts (studentScores sc)
   where
     n         = length sc
-    (ns, pts) = unzip [(n, pt) | (Assignment n pt _, _) <- sc]
+    (ns, pts) = unzip [(n, pt) | (Entity _ (Assignment n pt _), _) <- sc]
 
 studentScores    :: Scores -> [(Text, [Int])]
 studentScores sc = [(e, eScore e <$> aTables) | e <- emails]

@@ -31,6 +31,7 @@ Assignment
   points       Int
   class        ClassId
   UniqueAssignment name class
+  deriving Eq
 
 Score
   student      UserId
