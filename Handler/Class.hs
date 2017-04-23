@@ -223,7 +223,6 @@ getAssignmentR classId assignId = do
   scores              <- getAssignmentScores classId assignId
   (stdWidget, stdEnc) <- generateFormPost (scoreForm scores)
   (asgWidget, asgEnc) <- generateFormPost assignForm
-  -- (scoWidget, scoEnc) <- generateFormPost fileForm
   defaultLayout $
     $(widgetFile "viewAssignment")
 
