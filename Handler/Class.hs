@@ -23,6 +23,34 @@ scoresStudent :: (Eq k, Hashable k) => [k] -> [(Text, [b])] -> [(k, [(Text, b)])
 stringScores  :: Int -> String -> Either String (Text, [Int])
 
 --------------------------------------------------------------------------------
+-- | Admin ---------------------------------------------------------------------
+--------------------------------------------------------------------------------
+getAdminR :: Handler Html
+getAdminR = do
+  instrs               <- DB.getInstructors
+  (insWidget, insEnc)  <- generateFormPost addUserForm
+  defaultLayout $
+    $(widgetFile "admin")
+
+postNewInstructorR :: Handler Html
+postNewInstructorR = do
+  extHandleR (runFormHandler addUserForm) addInstructorR
+  redirect AdminR
+
+addInstructorR :: AddUserForm -> Handler ()
+addInstructorR (AddUserForm email) = do
+  mbIns <- createUserR email AdminR
+  case mbIns of
+    Nothing -> setMessage $ "Error adding teacher: " ++ TB.text email
+    Just e  -> void $ DB.addInstructor (entityKey e)
+
+getDelInstructorR :: UserId -> Handler Html
+getDelInstructorR userId = do
+  extHandleR
+    (return (Just userId))
+    (\_ -> DB.delInstructor userId)
+  redirect AdminR
+--------------------------------------------------------------------------------
 -- | Viewing/Changing User Settings --------------------------------------------
 --------------------------------------------------------------------------------
 getEditUserR :: Handler Html
@@ -88,8 +116,8 @@ addScoresR' classId assignId scores = do
 fileScores :: ClassId -> FileInfo
            -> Handler (Either String [(AssignmentId, [(Text, Int)])])
 fileScores classId file = do
-  ls <- liftIO $ fileLines file
-  case ls of
+  ls' <- liftIO $ fileLines file
+  case ls' of
     []       -> return (Left "Empty .csv file!")
     [_,_]    -> return (Left "Empty .csv file!")
     (l:_:ls) -> case fromString <$> stringFields' l of
@@ -106,7 +134,6 @@ fileAsgns classId as = do
   asgns <- getAssignmentsByClass classId
   return $ sequenceA (getAsgnId asgns <$> as)
 
--- HEREHEREHEREHEREHERE
 getAsgnId :: [Entity Assignment] -> Text -> Either String AssignmentId
 getAsgnId asgns a = case find f asgns of
                       Nothing   -> Left ("Unknown assignment" ++ show a)
@@ -168,9 +195,8 @@ classScores classId = do
     return (a, scores)
 
 scoresCsv :: Scores -> ClassCsv
-scoresCsv sc  = ClassCsv n ns pts (studentScores sc)
+scoresCsv sc  = ClassCsv (length sc) ns pts (studentScores sc)
   where
-    n         = length sc
     (ns, pts) = unzip [(n, pt) | (Entity _ (Assignment n pt _), _) <- sc]
 
 studentScores    :: Scores -> [(Text, [Int])]
@@ -242,7 +268,7 @@ getAssignmentR classId assignId = do
   scores              <- getAssignmentScores classId assignId
   (stdWidget, stdEnc) <- generateFormPost (scoreForm scores)
   (asgWidget, asgEnc) <- generateFormPost assignForm
-  (scoWidget, scoEnc) <- generateFormPost fileForm
+  -- (scoWidget, scoEnc) <- generateFormPost fileForm
   defaultLayout $
     $(widgetFile "viewAssignment")
 
@@ -318,23 +344,22 @@ getDelStdR classId userId =
 --------------------------------------------------------------------------------
 -- | Adding New Instructors ----------------------------------------------------
 --------------------------------------------------------------------------------
-postNewInstructorR :: ClassId -> Handler Html
-postNewInstructorR classId =
+postNewTeacherR :: ClassId -> Handler Html
+postNewTeacherR classId =
   extendClassFormR
-    "add instructor"
+    "add teacher"
     addUserForm
-    (addInstructorR classId)
+    (addTeacherR classId)
     classId
     (ClassInsR classId)
 
-addInstructorR :: ClassId -> AddUserForm -> Handler ()
-addInstructorR classId userForm = do
+addTeacherR :: ClassId -> AddUserForm -> Handler ()
+addTeacherR classId userForm = do
   mbStd <- addUserR classId userForm
   case mbStd of
-    Nothing ->    setMessage $ "Error adding instructor: " ++ TB.text (auEmail userForm)
-    Just e  -> do setMessage $ "Added instructor: "        ++ TB.text (auEmail userForm)
+    Nothing ->    setMessage $ "Error adding teacher: " ++ TB.text (auEmail userForm)
+    Just e  -> do setMessage $ "Added teacher: "        ++ TB.text (auEmail userForm)
                   void $ updTeacher classId (entityKey e)
-                  -- runDB (insert (Teacher (entityKey e) classId))
 
 --------------------------------------------------------------------------------
 -- | Creating New Assignments --------------------------------------------------
@@ -445,14 +470,19 @@ addStudentR classId userForm = do
                   void $ runDB (insert (Student (entityKey e) classId))
 
 addUserR :: ClassId -> AddUserForm -> Handler (Maybe (Entity User))
-addUserR classId (AddUserForm sEmail) = do
-  mbU <- getUserByEmail sEmail
+addUserR classId (AddUserForm sEmail) =
+  createUserR sEmail (ClassInsR classId)
+
+createUserR :: Text -> Route App -> Handler (Maybe (Entity User))
+createUserR email r = do
+  mbU <- getUserByEmail email
   case mbU of
     Just _  -> return mbU
     Nothing -> do _ <- Auth.createNewCustomAccount
-                         (Auth.CustomNewAccountData sEmail ("?" ++ sEmail ++ "?") sEmail sEmail)
-                         (const (ClassInsR classId))
-                  getUserByEmail sEmail
+                         (Auth.CustomNewAccountData email ("?" ++ email ++ "?") email email)
+                         (const r)
+                  getUserByEmail email
+
 
 --------------------------------------------------------------------------------
 -- | Generic Class Extension ---------------------------------------------------
@@ -480,13 +510,15 @@ extendClassHandleR msg h extR classId r = do
   (uid    , _) <- requireAuthPair
   if uid /= instrId
     then setMessage ("Sorry, can only " ++ msg ++ "for your own class!")
-    else do
-      result <- h
-      case result of
-        Just o -> extR o
-        _      -> setMessage "Something went wrong!"
+    else extHandleR h extR
   redirect r
 
+extHandleR :: Handler (Maybe a) -> (a -> Handler ()) -> Handler ()
+extHandleR h extR = do
+  result <- h
+  case result of
+    Just o -> extR o
+    _      -> setMessage "Something went wrong!"
 
 --------------------------------------------------------------------------------
 -- | Creating New Classes ------------------------------------------------------
@@ -525,8 +557,7 @@ classForm = renderForm $ ClassForm
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-classEditWidget classId clsEnc clsWidget
+classEdit classId clsEnc clsWidget
   = $(widgetFile "classEdit")
 
 classInstructors classId instructor teachers insEnc insWidget

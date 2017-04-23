@@ -15,7 +15,7 @@
     <div .tab-content>
 
         <div .tab-pane.fade id="tab-edit">
-            ^{classEditWidget classId clsEnc clsWidget}
+            ^{classEdit classId clsEnc clsWidget}
 
         <div .tab-pane.fade id="tab-instructors">
             ^{classInstructors classId instructor teachers insEnc insWidget}

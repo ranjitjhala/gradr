@@ -39,6 +39,11 @@ Score
   points       Int
   UniqueScore  student assignment
 
+Instructor
+  name         UserId
+  deriving Eq
+
+
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text
     userId UserId Maybe

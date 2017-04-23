@@ -21,7 +21,7 @@ getHomeR :: Handler Html
 getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
     let submission = Nothing :: Maybe FileForm
-        handlerName = "getHomeR" :: Text
+        _handlerName = "getHomeR" :: Text
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
         aDomId <- newIdent
@@ -31,7 +31,7 @@ getHomeR = do
 postHomeR :: Handler Html
 postHomeR = do
     ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
+    let _handlerName = "postHomeR" :: Text
         submission = case result of
             FormSuccess res -> Just res
             _ -> Nothing

@@ -88,12 +88,11 @@ instance Yesod App where
     yesodMiddleware = defaultYesodMiddleware
 
     defaultLayout widget = do
-        master <- getYesod
-        mmsg <- getMessage
-
-        muser <- maybeAuthPair
+        master        <- getYesod
+        mmsg          <- getMessage
+        muser         <- maybeAuthPair
         mcurrentRoute <- getCurrentRoute
-
+        isInstr       <- (Authorized ==) <$> isInstructor
         -- Get the breadcrumbs, as defined in the YesodBreadcrumbs instance.
         (title, parents) <- breadcrumbs
 
@@ -105,6 +104,11 @@ instance Yesod App where
                     , menuItemAccessCallback = isNothing muser -- True
                     }
                 , NavbarLeft MenuItem
+                    { menuItemLabel          = "Admin"
+                    , menuItemRoute          = AdminR
+                    , menuItemAccessCallback = isAdmin muser
+                    }
+                , NavbarLeft MenuItem
                     { menuItemLabel          = "Profile"
                     , menuItemRoute          = ProfileR
                     , menuItemAccessCallback = isJust muser
@@ -112,7 +116,7 @@ instance Yesod App where
                 , NavbarLeft MenuItem
                     { menuItemLabel          = "Create"
                     , menuItemRoute          = NewClassR
-                    , menuItemAccessCallback = isJust muser
+                    , menuItemAccessCallback = isInstr
                     }
                 , NavbarRight MenuItem
                     { menuItemLabel          = "Login"
@@ -159,9 +163,9 @@ instance Yesod App where
     isAuthorized FaviconR _        = return Authorized
     isAuthorized RobotsR _         = return Authorized
     isAuthorized (StaticR _) _     = return Authorized
+    isAuthorized NewClassR   _        = isInstructor
     isAuthorized ProfileR    _        = isAuthenticated
     isAuthorized EditUserR _          = isAuthenticated
-    isAuthorized NewClassR   _        = isAuthenticated
     isAuthorized (EditClassR _) _     = isAuthenticated
     isAuthorized (NewAssignR _) _     = isAuthenticated
     isAuthorized (ClassInsR _)  _     = isAuthenticated
@@ -169,7 +173,7 @@ instance Yesod App where
     isAuthorized (AssignmentR _ _ ) _ = isAuthenticated
     isAuthorized (NewStudentR _) _    = isAuthenticated
     isAuthorized (NewStudentsR _) _   = isAuthenticated
-    isAuthorized (NewInstructorR _) _ = isAuthenticated
+    isAuthorized (NewTeacherR _) _    = isAuthenticated
     isAuthorized (ScoreR _ _) _       = isAuthenticated
     isAuthorized (DelInsR _ _) _      = isAuthenticated
     isAuthorized (DelStdR _ _) _      = isAuthenticated
@@ -177,6 +181,10 @@ instance Yesod App where
     isAuthorized (DelAssignmentR _ _) _  = isAuthenticated
     isAuthorized (ClassImportR _) _      = isAuthenticated
     isAuthorized (ClassExportR _ ) _     = isAuthenticated
+    isAuthorized AdminR _                = isAuthenticated
+    isAuthorized NewInstructorR _        = isAuthenticated
+    isAuthorized (DelInstructorR _) _    = isAuthenticated
+
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -271,11 +279,14 @@ emailBody action user url = LT.fromStrict $
 
 sendEmail :: Text -> Text -> LT.Text -> IO ()
 sendEmail email subject body = do
-  let from = Address (Just "gradr") "rjhala@eng.ucsd.edu"
+  let from = Address (Just "gradr") gradrAdmin
       to   = Address Nothing email
   m       <- simpleMail to from subject "" body []
   putStrLn $ "sending mail: " ++ tshow m
   renderSendMail m
+
+gradrAdmin :: IsString a => a
+gradrAdmin = "rjhala@eng.ucsd.edu"
 
 -- instance YesodJquery App
 
@@ -313,7 +324,28 @@ isAuthenticated = do
     muid <- maybeAuthId
     return $ case muid of
         Nothing -> Unauthorized "You must login to access this page"
-        Just _ -> Authorized
+        Just _  -> Authorized
+
+isInstructor :: Handler AuthResult
+isInstructor = do
+  muid <- maybeAuthId
+  case muid of
+     Nothing  -> return $ Unauthorized "You must login to access this page"
+     Just uid -> do b <- runDB $ selectFirst [InstructorName ==. uid] []
+                    return $ case b of
+                      Nothing -> Unauthorized msg
+                      Just _  -> Authorized
+  where
+    msg = fromString . unwords $
+            ["Only instructors can create classes, please ask "
+            , gradrAdmin
+            , " to make you an instructor"
+            ]
+
+isAdmin :: Maybe (a, User) -> Bool
+isAdmin Nothing       = False
+isAdmin (Just (_, u)) = userEmailAddress u == gradrAdmin
+
 
 instance YesodAuthPersist App
 

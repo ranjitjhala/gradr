@@ -12,21 +12,24 @@ Web application for managing grades
 
 [hack in isAuthorized]
 
-- [ ] Only an instructor can add assignments
-- [ ] Only an instructor can del assignments
-- [ ] Only an instructor can add teachers
-- [ ] Only an instructor can add students
-- [ ] Only an instructor can view the students in a class
-- [ ] Only an instructor can view the assignments in a class
-- [ ] Only an instructor can view the scores in a class
+- [ ] Only an admin      can add instructors
+- [ ] Only an admin      can del instructors
+- [ ] Only an instr      can del class
+- [ ] Only an instr      can add assignments
+- [ ] Only an instr      can del assignments
+- [ ] Only an instr      can add teachers
+- [ ] Only an instr      can add students
+- [ ] Only a  teacher    can view the students in a class
+- [ ] Only a  teacher    can view the assignments in a class
+- [ ] Only a  teacher    can view the scores in a class
 - [ ] Only a student in a class can see the assignments
 - [ ] Only a student in a class can see their own scores
 
 ### Views
 
-- [ ] CLASS   Import class by CSV   <<<< HEREHERE
-- [ ] ADMIN   Create Classes
-- [ ] ADMIN   Delete Classes
+- [ ] INSTR   Delete Class    <<<< HEREHEREHERE
+- [ ] INSTR   View   Scores   
+- [ ] STUDENT View   Scores
 
 ### Import / Export  CSV format
 

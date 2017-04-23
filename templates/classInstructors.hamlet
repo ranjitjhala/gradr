@@ -20,7 +20,7 @@
     <h3> Add
 
         <div .bs-callout bs-callout-info well>
-          <form .form-horizontal method=post action=@{NewInstructorR classId} enctype=#{insEnc}>
+          <form .form-horizontal method=post action=@{NewTeacherR classId} enctype=#{insEnc}>
               ^{insWidget}
 
     <hr>

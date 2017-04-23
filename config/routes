@@ -16,7 +16,7 @@
 /class/view/instructor/#ClassId           ClassInsR       GET
 /class/view/student/#ClassId              ClassStdR       GET
 /class/edit/settings/#ClassId             EditClassR      POST
-/class/edit/instructor/#ClassId           NewInstructorR  POST
+/class/edit/teacher/#ClassId              NewTeacherR     POST
 /class/edit/student/#ClassId              NewStudentR     POST          -- enroll single student
 /class/edit/students/#ClassId             NewStudentsR    POST          -- enroll many students by csv
 
@@ -31,3 +31,7 @@
 /score/#ClassId/#AssignmentId             ScoreR          POST
 /class/import/#ClassId                    ClassImportR    POST          -- import a .csv of scores
 /class/export/#ClassId                    ClassExportR    GET           -- export a .csv of all students' scores
+
+/admin                                    AdminR          GET           -- show Instructors list
+/admin/new                                NewInstructorR  POST
+/admin/del/#UserId                        DelInstructorR  GET             

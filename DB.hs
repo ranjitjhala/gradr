@@ -1,10 +1,11 @@
 module DB where
 
 -- import qualified Data.List as L
-import qualified Data.HashMap.Strict as M
 import           Import
+import qualified Data.HashMap.Strict as M
 import qualified Database.Esqueleto as E
 import           Database.Esqueleto ((^.))
+
 
 getClassesInsByUser :: Key User -> Handler [Entity Class]
 getClassesInsByUser userId = do
@@ -61,6 +62,15 @@ getStudentsByClass classId =
                       (student ^. StudentClass E.==. E.val classId)
                return user
 
+
+getInstructors :: Handler [Entity User]
+getInstructors =
+  runDB $ E.select
+          $ E.from
+            $ \(instructor `E.InnerJoin` user) -> do
+               E.on $ (instructor ^. InstructorName  E.==. user ^. UserId)
+               return user
+
 getInstructorsByClass :: Key Class -> Handler [Entity User]
 getInstructorsByClass classId =
   runDB $ E.select
@@ -101,6 +111,14 @@ updAssign aId aName aPts = runDB $
 updTeacher :: ClassId -> UserId -> Handler TeacherId
 updTeacher classId userId = runDB $
   insert (Teacher userId classId)
+
+addInstructor :: UserId -> Handler InstructorId
+addInstructor userId = runDB $
+  insert (Instructor userId)
+
+delInstructor :: UserId -> Handler ()
+delInstructor userId = runDB $
+  deleteWhere [ InstructorName ==. userId ]
 
 delTeacher :: ClassId -> UserId -> Handler ()
 delTeacher classId userId = runDB $
