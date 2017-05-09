@@ -315,8 +315,8 @@ instance YesodAuthAccount (AccountPersistDB App User) App where
     tm <- getRouteToParent
     lift $ defaultLayout $ do
       setTitleI Msg.PasswordResetTitle
-      -- ((_,widget), enctype) <- liftHandlerT $ runFormPost $ renderDivs resetPasswordForm
-      ((_,widget), enctype) <- liftHandlerT $ runFormPostNoToken $ Auth.customResetForm
+      ((_,widget), enctype) <- liftHandlerT $ runFormPost $ renderDivs resetPasswordForm
+      -- ((_,widget), enctype) <- liftHandlerT $ runFormPostNoToken $ Auth.customResetForm
       $(widgetFile "reset-password")
 
 -- | Access function to determine if a user is logged in.

@@ -3,9 +3,10 @@
         <div .row>
             <h1 .header>
                 Gradr
-            <a href="http://ranjitjhala.github.io" .btn.btn-info.btn-lg>
+            <a href=@{AuthR LoginR} .btn.btn-info.btn-lg>
                 Management, of courses.
 
+<!--
 <div .container>
 
     <!-- Forms
@@ -90,3 +91,4 @@
                        test suite that performs tests on this page.
                    <p>
                        You can run your tests by doing: <code>stack test</code>
+-->
