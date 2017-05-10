@@ -224,7 +224,7 @@ getAssignmentR classId assignId = do
   (stdWidget, stdEnc) <- generateFormPost (scoreForm scores)
   (asgWidget, asgEnc) <- generateFormPost assignForm
   defaultLayout $
-    $(widgetFile "viewAssignment")
+    $(widgetFile "viewassignment")
 
 --------------------------------------------------------------------------------
 -- | Edit Name/Term for Class --------------------------------------------------
